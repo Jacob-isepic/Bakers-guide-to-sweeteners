@@ -1,28 +1,51 @@
 body {
-  font-family: Arial;
+  font-family: Arial, sans-serif;
   max-width: 600px;
   margin: auto;
-  padding: 20px;
-  background: #f6f6f6;
-  text-align: center;
+  padding: 18px;
+  background: #f5f6f8;
 }
 
-.menu {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+h1, h2 {
+  text-align: center;
 }
 
 .card {
   background: white;
-  padding: 15px;
-  border-radius: 12px;
-  text-decoration: none;
-  color: black;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 14px;
+  border-radius: 14px;
+  margin: 12px 0;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
 }
 
-.card p {
-  font-size: 12px;
-  color: gray;
+a.card {
+  display: block;
+  text-decoration: none;
+  color: black;
+}
+
+input, select {
+  width: 100%;
+  padding: 10px;
+  margin: 6px 0 12px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  background: black;
+  color: white;
+  font-size: 16px;
+}
+
+#result {
+  margin-top: 14px;
+  padding: 14px;
+  background: white;
+  border-radius: 12px;
+  white-space: pre-line;
 }

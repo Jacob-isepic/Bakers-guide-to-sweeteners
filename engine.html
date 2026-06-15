@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sugar Engine</title>
+<style>
+body { font-family: Arial; padding: 20px; background: #f5f6f8; }
+.card { background: white; padding: 15px; border-radius: 12px; }
+input, select { width: 100%; padding: 10px; margin-top: 10px; }
+button { margin-top: 10px; padding: 10px; width: 100%; }
+</style>
+</head>
+<body>
+
+<h2>🍪 Sugar Engine</h2>
+
+<div class="card">
+<label>Sugar (grams)</label>
+<input type="number" id="sugar" placeholder="e.g. 100">
+
+<label>Replace with</label>
+<select id="type">
+  <option value="monkfruit">Monk Fruit</option>
+  <option value="allulose">Allulose</option>
+</select>
+
+<button onclick="calc()">Calculate</button>
+
+<h3 id="result"></h3>
+</div>
+
+<script>
+function calc() {
+  let sugar = document.getElementById("sugar").value;
+
+  if (!sugar) return;
+
+  let type = document.getElementById("type").value;
+  let result = 0;
+
+  if (type === "monkfruit") {
+    result = sugar * 0.5; // simple starting ratio
+  } else {
+    result = sugar * 1.3; // allulose needs more volume
+  }
+
+  document.getElementById("result").innerText =
+    "Use approx " + result + "g of " + type;
+}
+</script>
+
+</body>
+</html>

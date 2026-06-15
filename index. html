@@ -1,159 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Baker Sweetener Engine</title>
-
-<style>
-body {
-  font-family: Arial;
-  max-width: 520px;
-  margin: auto;
-  padding: 18px;
-  background: #f6f6f6;
-}
-
-h2 {
-  text-align: center;
-}
-
-.card {
-  background: white;
-  padding: 14px;
-  border-radius: 12px;
-  margin-bottom: 12px;
-}
-
-label {
-  font-size: 14px;
-  font-weight: bold;
-}
-
-input, select {
-  width: 100%;
-  padding: 10px;
-  margin: 6px 0 12px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-}
-
-button {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 10px;
-  background: black;
-  color: white;
-  font-size: 16px;
-}
-
-#result {
-  white-space: pre-line;
-  margin-top: 14px;
-  padding: 14px;
-  background: #fff;
-  border-radius: 12px;
-}
-
-.small {
-  font-size: 12px;
-  color: #555;
-}
-</style>
+  <title>Baker Toolkit</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<h2>🍪 Baker Sweetener Engine v2</h2>
+<h1>🧁 Baker Sweetener Toolkit</h1>
+<p>Choose what you want to calculate:</p>
 
-<div class="card">
+<div class="menu">
 
-<label>Recipe Type</label>
-<select id="type">
-  <option value="cookie">Cookie (crispy/chewy)</option>
-  <option value="cake">Cake (soft)</option>
-  <option value="brownie">Brownie (dense)</option>
-  <option value="muffin">Muffin (light)</option>
-</select>
+  <a href="engine.html" class="card">
+    🍪 Full Sweetener Engine
+    <p>Balance sugar, allulose, monk fruit & stevia</p>
+  </a>
 
-<label>Total Sugar (g)</label>
-<input id="sugar" type="number" value="100">
+  <a href="monkfruit.html" class="card">
+    🍬 Monk Fruit Converter
+    <p>Convert sugar → monk fruit sweetness</p>
+  </a>
 
-<label>Sugar Reduction (%)</label>
-<input id="reduction" type="number" value="50">
-
-<label>Sweetness Preference (%)</label>
-<input id="taste" type="number" value="100">
-
-</div>
-
-<div class="card">
-
-<label>Allulose % of replacement</label>
-<input id="allulose" type="number" value="70">
-
-<label>Monk Fruit Sweetness Factor</label>
-<input id="monkFactor" type="number" value="200">
-
-<label>Stevia Sweetness Factor</label>
-<input id="steviaFactor" type="number" value="250">
+  <a href="allulose.html" class="card">
+    🍯 Allulose Calculator
+    <p>Replace sugar with baking-safe allulose</p>
+  </a>
 
 </div>
-
-<button onclick="calc()">Generate Recipe</button>
-
-<div id="result"></div>
-
-<script>
-function calc() {
-
-  let sugar = Number(document.getElementById("sugar").value);
-  let reduction = Number(document.getElementById("reduction").value);
-  let taste = Number(document.getElementById("taste").value) / 100;
-  let allulosePct = Number(document.getElementById("allulose").value) / 100;
-  let monkFactor = Number(document.getElementById("monkFactor").value);
-  let steviaFactor = Number(document.getElementById("steviaFactor").value);
-  let type = document.getElementById("type").value;
-
-  // 🧱 baking structure rules
-  let minSugar = sugar * 0.3;
-
-  if (type === "cookie") minSugar = sugar * 0.4;
-  if (type === "brownie") minSugar = sugar * 0.35;
-  if (type === "cake") minSugar = sugar * 0.3;
-  if (type === "muffin") minSugar = sugar * 0.25;
-
-  // 🎯 target sugar
-  let targetSugar = sugar * (1 - reduction / 100);
-  let sugarKept = Math.max(targetSugar, minSugar);
-
-  // 🍯 how much sugar we are actually replacing
-  let replaced = (sugar - sugarKept) * taste;
-
-  // 🧠 split logic
-  let allulosePart = replaced * allulosePct;
-  let sweetPart = replaced * (1 - allulosePct);
-
-  // split sweeteners
-  let monkPart = sweetPart * 0.5;
-  let steviaPart = sweetPart * 0.5;
-
-  // conversions
-  let allulose = allulosePart / 0.7;
-  let monk = monkPart / monkFactor;
-  let stevia = steviaPart / steviaFactor;
-
-  // 📊 output
-  document.getElementById("result").innerHTML =
-    "🍪 FINAL BAKING FORMULA\n\n" +
-    "🥄 Sugar: " + sugarKept.toFixed(1) + "g\n" +
-    "🍯 Allulose: " + allulose.toFixed(1) + "g\n" +
-    "🍬 Monk fruit: " + monk.toFixed(3) + "g\n" +
-    "🌿 Stevia: " + stevia.toFixed(3) + "g\n\n" +
-    "📉 Effective sugar reduced: " + replaced.toFixed(1) + "g\n\n" +
-    "⚠️ Note: Designed for pure extracts, not 1:1 erythritol blends.";
-}
-</script>
 
 </body>
 </html>

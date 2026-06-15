@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recipe Converter</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<h2>🧁 Recipe Converter</h2>
+
+<div class="card">
+
+<label>Recipe Type</label>
+<select id="recipe">
+  <option value="cookies">Cookies</option>
+  <option value="cake">Cake</option>
+  <option value="brownies">Brownies</option>
+</select>
+
+<label>Sugar (grams)</label>
+<input type="number" id="sugar">
+
+<label>Sweetener</label>
+<select id="type">
+  <option value="monkfruit">Monk Fruit Blend</option>
+  <option value="allulose">Allulose</option>
+</select>
+
+<button onclick="convert()">Convert Recipe</button>
+
+</div>
+
+<div class="card">
+<pre id="out" style="white-space: pre-wrap;"></pre>
+</div>
+
+<script>
+function convert() {
+
+  let sugar = Number(document.getElementById("sugar").value);
+  let type = document.getElementById("type").value;
+  let recipe = document.getElementById("recipe").value;
+
+  if (!sugar) return;
+
+  let sweet = 0;
+  let structureTip = "";
+
+  if (type === "monkfruit") sweet = sugar * 0.5;
+  if (type === "allulose") sweet = sugar * 1.3;
+
+  if (recipe === "cookies") {
+    structureTip = "Add slight extra fat for moisture retention";
+  }
+  if (recipe === "cake") {
+    structureTip = "Do not reduce liquid — structure depends on it";
+  }
+  if (recipe === "brownies") {
+    structureTip = "Allulose gives best chew and caramelisation";
+  }
+
+  document.getElementById("out").innerText =
+`🧁 CONVERTED RECIPE
+
+Original sugar: ${sugar}g
+Sweetener needed: ~${sweet.toFixed(1)}g (${type})
+
+🍪 Recipe type: ${recipe}
+
+🧠 Structure adjustment:
+${structureTip}
+
+✔ Optimized for texture + sweetness balance`;
+}
+</script>
+
+</body>
+</html>

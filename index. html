@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Baker Sweetener Tool</title>
+  <style>
+    body {
+      font-family: Arial;
+      max-width: 500px;
+      margin: auto;
+      padding: 20px;
+    }
+    input {
+      width: 100%;
+      margin: 6px 0 14px;
+      padding: 8px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: black;
+      color: white;
+      border: none;
+    }
+    #result {
+      margin-top: 20px;
+      white-space: pre-line;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>🍪 Baker Sweetener Tool</h2>
+
+<label>Total Sugar (g)</label>
+<input id="sugar" type="number" value="100">
+
+<label>Sugar Reduction (%)</label>
+<input id="reduction" type="number" value="50">
+
+<label>Allulose Usage (% of replacement)</label>
+<input id="allulose" type="number" value="70">
+
+<label>Monk Fruit Sweetness Factor</label>
+<input id="factor" type="number" value="200">
+
+<button onclick="calc()">Calculate</button>
+
+<div id="result"></div>
+
+<script>
+function calc() {
+
+  let sugar = Number(document.getElementById("sugar").value);
+  let reduction = Number(document.getElementById("reduction").value);
+  let allulosePct = Number(document.getElementById("allulose").value) / 100;
+  let factor = Number(document.getElementById("factor").value);
+
+  // keep minimum sugar for structure
+  let targetSugar = sugar * (1 - reduction / 100);
+  let minSugar = sugar * 0.3;
+  let sugarKept = Math.max(targetSugar, minSugar);
+
+  let replaced = sugar - sugarKept;
+
+  // split replacement
+  let allulosePart = replaced * allulosePct;
+  let monkPart = replaced * (1 - allulosePct);
+
+  // conversions
+  let allulose = allulosePart / 0.7;
+  let monk = monkPart / factor;
+
+  document.getElementById("result").innerHTML =
+    "Sugar: " + sugarKept.toFixed(1) + "g\n" +
+    "Allulose: " + allulose.toFixed(1) + "g\n" +
+    "Monk fruit: " + monk.toFixed(3) + "g\n" +
+    "Reduced sugar: " + replaced.toFixed(1) + "g";
+}
+</script>
+
+</body>
+</html>

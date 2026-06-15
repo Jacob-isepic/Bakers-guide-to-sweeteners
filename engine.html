@@ -4,20 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sugar Engine</title>
-<style>
-body { font-family: Arial; padding: 20px; background: #f5f6f8; }
-.card { background: white; padding: 15px; border-radius: 12px; }
-input, select { width: 100%; padding: 10px; margin-top: 10px; }
-button { margin-top: 10px; padding: 10px; width: 100%; }
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 <h2>🍪 Sugar Engine</h2>
 
 <div class="card">
-<label>Sugar (grams)</label>
-<input type="number" id="sugar" placeholder="e.g. 100">
+<label>Enter sugar amount (grams)</label>
+<input type="number" id="sugar">
 
 <label>Replace with</label>
 <select id="type">
@@ -25,28 +21,46 @@ button { margin-top: 10px; padding: 10px; width: 100%; }
   <option value="allulose">Allulose</option>
 </select>
 
-<button onclick="calc()">Calculate</button>
+<button onclick="calc()">Generate Baking Plan</button>
 
 <h3 id="result"></h3>
+<p id="note"></p>
 </div>
 
 <script>
 function calc() {
-  let sugar = document.getElementById("sugar").value;
-
-  if (!sugar) return;
-
+  let sugar = Number(document.getElementById("sugar").value);
   let type = document.getElementById("type").value;
+
+  if (!sugar || sugar <= 0) return;
+
   let result = 0;
+  let message = "";
 
   if (type === "monkfruit") {
-    result = sugar * 0.5; // simple starting ratio
+    result = sugar * 0.5;
+
+    message =
+      `🧁 Baking Adjustment Plan:\n\n` +
+      `• Replace sugar with ~${result.toFixed(1)}g monk fruit blend\n` +
+      `• Sweetness: matches original level\n` +
+      `• Structure: slightly lighter texture\n\n` +
+      `Tip: If using pure extract, reduce further — blends behave more like sugar.`;
+
   } else {
-    result = sugar * 1.3; // allulose needs more volume
+    result = sugar * 1.3;
+
+    message =
+      `🍯 Baking Adjustment Plan:\n\n` +
+      `• Replace sugar with ~${result.toFixed(1)}g allulose\n` +
+      `• Sweetness: slightly less intense than sugar\n` +
+      `• Structure: improves browning & moisture\n\n` +
+      `Tip: You can reduce sweetness intentionally — not all sugar must be replaced.`;
   }
 
-  document.getElementById("result").innerText =
-    "Use approx " + result + "g of " + type;
+  document.getElementById("result").innerText = message;
+  document.getElementById("note").innerText =
+    "✔ Adjustment generated using Baker Engine v1";
 }
 </script>
 

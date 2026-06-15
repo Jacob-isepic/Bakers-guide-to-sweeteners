@@ -1,61 +1,79 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Baker Sweetener Engine</title>
+<meta charset="UTF-8">
+<title>Baker Sweetener Engine</title>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 520px;
-      margin: auto;
-      padding: 20px;
-      background: #f7f7f7;
-    }
+<style>
+body {
+  font-family: Arial;
+  max-width: 520px;
+  margin: auto;
+  padding: 18px;
+  background: #f6f6f6;
+}
 
-    h2 {
-      text-align: center;
-    }
+h2 {
+  text-align: center;
+}
 
-    input, select {
-      width: 100%;
-      padding: 10px;
-      margin: 6px 0 14px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
+.card {
+  background: white;
+  padding: 14px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
 
-    button {
-      width: 100%;
-      padding: 12px;
-      background: black;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 16px;
-    }
+label {
+  font-size: 14px;
+  font-weight: bold;
+}
 
-    #result {
-      margin-top: 20px;
-      padding: 15px;
-      background: white;
-      border-radius: 10px;
-      white-space: pre-line;
-    }
-  </style>
+input, select {
+  width: 100%;
+  padding: 10px;
+  margin: 6px 0 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: black;
+  color: white;
+  font-size: 16px;
+}
+
+#result {
+  white-space: pre-line;
+  margin-top: 14px;
+  padding: 14px;
+  background: #fff;
+  border-radius: 12px;
+}
+
+.small {
+  font-size: 12px;
+  color: #555;
+}
+</style>
 </head>
 
 <body>
 
-<h2>🍪 Baker Sweetener Engine</h2>
+<h2>🍪 Baker Sweetener Engine v2</h2>
+
+<div class="card">
 
 <label>Recipe Type</label>
 <select id="type">
-  <option value="cookie">Cookie</option>
-  <option value="cake">Cake</option>
-  <option value="brownie">Brownie</option>
-  <option value="muffin">Muffin</option>
+  <option value="cookie">Cookie (crispy/chewy)</option>
+  <option value="cake">Cake (soft)</option>
+  <option value="brownie">Brownie (dense)</option>
+  <option value="muffin">Muffin (light)</option>
 </select>
 
 <label>Total Sugar (g)</label>
@@ -67,7 +85,11 @@
 <label>Sweetness Preference (%)</label>
 <input id="taste" type="number" value="100">
 
-<label>Allulose Usage (% of replacement)</label>
+</div>
+
+<div class="card">
+
+<label>Allulose % of replacement</label>
 <input id="allulose" type="number" value="70">
 
 <label>Monk Fruit Sweetness Factor</label>
@@ -75,6 +97,8 @@
 
 <label>Stevia Sweetness Factor</label>
 <input id="steviaFactor" type="number" value="250">
+
+</div>
 
 <button onclick="calc()">Generate Recipe</button>
 
@@ -91,25 +115,26 @@ function calc() {
   let steviaFactor = Number(document.getElementById("steviaFactor").value);
   let type = document.getElementById("type").value;
 
-  // recipe-based structure protection
-  let minSugar = sugar * 0.25;
+  // 🧱 baking structure rules
+  let minSugar = sugar * 0.3;
+
   if (type === "cookie") minSugar = sugar * 0.4;
   if (type === "brownie") minSugar = sugar * 0.35;
   if (type === "cake") minSugar = sugar * 0.3;
   if (type === "muffin") minSugar = sugar * 0.25;
 
-  // target sugar
+  // 🎯 target sugar
   let targetSugar = sugar * (1 - reduction / 100);
   let sugarKept = Math.max(targetSugar, minSugar);
 
-  // adjusted replacement based on taste preference
+  // 🍯 how much sugar we are actually replacing
   let replaced = (sugar - sugarKept) * taste;
 
-  // split system
+  // 🧠 split logic
   let allulosePart = replaced * allulosePct;
   let sweetPart = replaced * (1 - allulosePct);
 
-  // split sweeteners (monk + stevia split evenly)
+  // split sweeteners
   let monkPart = sweetPart * 0.5;
   let steviaPart = sweetPart * 0.5;
 
@@ -118,12 +143,15 @@ function calc() {
   let monk = monkPart / monkFactor;
   let stevia = steviaPart / steviaFactor;
 
+  // 📊 output
   document.getElementById("result").innerHTML =
-    "🥄 Sugar used: " + sugarKept.toFixed(1) + "g\n" +
+    "🍪 FINAL BAKING FORMULA\n\n" +
+    "🥄 Sugar: " + sugarKept.toFixed(1) + "g\n" +
     "🍯 Allulose: " + allulose.toFixed(1) + "g\n" +
     "🍬 Monk fruit: " + monk.toFixed(3) + "g\n" +
-    "🌿 Stevia: " + stevia.toFixed(3) + "g\n" +
-    "📉 Sugar reduced (effective): " + replaced.toFixed(1) + "g";
+    "🌿 Stevia: " + stevia.toFixed(3) + "g\n\n" +
+    "📉 Effective sugar reduced: " + replaced.toFixed(1) + "g\n\n" +
+    "⚠️ Note: Designed for pure extracts, not 1:1 erythritol blends.";
 }
 </script>
 

@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Sweetener Engine</title>
+  <title>Engine</title>
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<h2>🍪 Full Sweetener Engine</h2>
+<h2>🍪 Sweetener Engine</h2>
 
-<p>Adjust sugar, then balance sweeteners.</p>
+<div class="card">
+<p>Adjust sugar + reduction. Tool balances structure + sweetness automatically.</p>
+</div>
 
 <input id="sugar" type="number" placeholder="Sugar (g)">
 <input id="reduction" type="number" placeholder="Reduction %">
@@ -20,14 +21,25 @@
 
 <script>
 function calc() {
+
   let sugar = Number(document.getElementById("sugar").value);
   let reduction = Number(document.getElementById("reduction").value);
 
-  let kept = sugar * (1 - reduction / 100);
+  let target = sugar * (1 - reduction / 100);
+  let min = sugar * 0.3;
+
+  let kept = Math.max(target, min);
   let replaced = sugar - kept;
 
+  let allulose = (replaced * 0.7) / 0.7;
+  let monk = (replaced * 0.15) / 200;
+  let stevia = (replaced * 0.15) / 250;
+
   document.getElementById("result").innerHTML =
-    "🥄 Sugar: " + kept.toFixed(1) + "g<br>" +
+    "🥄 Sugar: " + kept.toFixed(1) + "g\n" +
+    "🍯 Allulose: " + allulose.toFixed(1) + "g\n" +
+    "🍬 Monk fruit: " + monk.toFixed(3) + "g\n" +
+    "🌿 Stevia: " + stevia.toFixed(3) + "g\n" +
     "📉 Reduced: " + replaced.toFixed(1) + "g";
 }
 </script>

@@ -1,28 +1,46 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Baker Sweetener Tool</title>
+  <meta charset="UTF-8">
+  <title>Baker Sweetener Engine</title>
+
   <style>
     body {
-      font-family: Arial;
-      max-width: 500px;
+      font-family: Arial, sans-serif;
+      max-width: 520px;
       margin: auto;
       padding: 20px;
+      background: #f7f7f7;
     }
-    input {
-      width: 100%;
-      margin: 6px 0 14px;
-      padding: 8px;
+
+    h2 {
+      text-align: center;
     }
-    button {
+
+    input, select {
       width: 100%;
       padding: 10px;
+      margin: 6px 0 14px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
       background: black;
       color: white;
       border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
     }
+
     #result {
       margin-top: 20px;
+      padding: 15px;
+      background: white;
+      border-radius: 10px;
       white-space: pre-line;
     }
   </style>
@@ -30,7 +48,15 @@
 
 <body>
 
-<h2>🍪 Baker Sweetener Tool</h2>
+<h2>🍪 Baker Sweetener Engine</h2>
+
+<label>Recipe Type</label>
+<select id="type">
+  <option value="cookie">Cookie</option>
+  <option value="cake">Cake</option>
+  <option value="brownie">Brownie</option>
+  <option value="muffin">Muffin</option>
+</select>
 
 <label>Total Sugar (g)</label>
 <input id="sugar" type="number" value="100">
@@ -38,13 +64,19 @@
 <label>Sugar Reduction (%)</label>
 <input id="reduction" type="number" value="50">
 
+<label>Sweetness Preference (%)</label>
+<input id="taste" type="number" value="100">
+
 <label>Allulose Usage (% of replacement)</label>
 <input id="allulose" type="number" value="70">
 
 <label>Monk Fruit Sweetness Factor</label>
-<input id="factor" type="number" value="200">
+<input id="monkFactor" type="number" value="200">
 
-<button onclick="calc()">Calculate</button>
+<label>Stevia Sweetness Factor</label>
+<input id="steviaFactor" type="number" value="250">
+
+<button onclick="calc()">Generate Recipe</button>
 
 <div id="result"></div>
 
@@ -53,29 +85,45 @@ function calc() {
 
   let sugar = Number(document.getElementById("sugar").value);
   let reduction = Number(document.getElementById("reduction").value);
+  let taste = Number(document.getElementById("taste").value) / 100;
   let allulosePct = Number(document.getElementById("allulose").value) / 100;
-  let factor = Number(document.getElementById("factor").value);
+  let monkFactor = Number(document.getElementById("monkFactor").value);
+  let steviaFactor = Number(document.getElementById("steviaFactor").value);
+  let type = document.getElementById("type").value;
 
-  // keep minimum sugar for structure
+  // recipe-based structure protection
+  let minSugar = sugar * 0.25;
+  if (type === "cookie") minSugar = sugar * 0.4;
+  if (type === "brownie") minSugar = sugar * 0.35;
+  if (type === "cake") minSugar = sugar * 0.3;
+  if (type === "muffin") minSugar = sugar * 0.25;
+
+  // target sugar
   let targetSugar = sugar * (1 - reduction / 100);
-  let minSugar = sugar * 0.3;
   let sugarKept = Math.max(targetSugar, minSugar);
 
-  let replaced = sugar - sugarKept;
+  // adjusted replacement based on taste preference
+  let replaced = (sugar - sugarKept) * taste;
 
-  // split replacement
+  // split system
   let allulosePart = replaced * allulosePct;
-  let monkPart = replaced * (1 - allulosePct);
+  let sweetPart = replaced * (1 - allulosePct);
+
+  // split sweeteners (monk + stevia split evenly)
+  let monkPart = sweetPart * 0.5;
+  let steviaPart = sweetPart * 0.5;
 
   // conversions
   let allulose = allulosePart / 0.7;
-  let monk = monkPart / factor;
+  let monk = monkPart / monkFactor;
+  let stevia = steviaPart / steviaFactor;
 
   document.getElementById("result").innerHTML =
-    "Sugar: " + sugarKept.toFixed(1) + "g\n" +
-    "Allulose: " + allulose.toFixed(1) + "g\n" +
-    "Monk fruit: " + monk.toFixed(3) + "g\n" +
-    "Reduced sugar: " + replaced.toFixed(1) + "g";
+    "🥄 Sugar used: " + sugarKept.toFixed(1) + "g\n" +
+    "🍯 Allulose: " + allulose.toFixed(1) + "g\n" +
+    "🍬 Monk fruit: " + monk.toFixed(3) + "g\n" +
+    "🌿 Stevia: " + stevia.toFixed(3) + "g\n" +
+    "📉 Sugar reduced (effective): " + replaced.toFixed(1) + "g";
 }
 </script>
 

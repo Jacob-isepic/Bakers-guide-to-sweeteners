@@ -50,12 +50,12 @@ function calc() {
 Sugar input: ${sugar}g
 Replace with: ~${blend.toFixed(1)}g blend
 
-✔ Sweetness: matches sugar
-✔ Texture: slightly lighter
+✔ Sweetness matches sugar
+✔ Slightly lighter texture
 ✔ Best for cakes, cookies, muffins
 
 💡 Tip:
-Keep 10–20% real sugar if you want better browning.`;
+Keep 10–20% real sugar for better browning.`;
 
   }
 
@@ -69,9 +69,9 @@ Keep 10–20% real sugar if you want better browning.`;
 Sugar input: ${sugar}g
 Replace with: ~${allulose.toFixed(1)}g allulose
 
-✔ Texture: very close to sugar
-✔ Browning: good caramelisation
-✔ Sweetness: slightly lower than sugar
+✔ Very close sugar texture
+✔ Good browning
+✔ Slightly less sweet
 
 💡 Tip:
 You can reduce sweetness intentionally for balance.`;
@@ -80,20 +80,26 @@ You can reduce sweetness intentionally for balance.`;
 
   else if (type === "pure") {
 
-    let mg = sugar * 4;
+    let low = (sugar * 1000) / 250;
+    let high = (sugar * 1000) / 150;
 
     message =
 `⚠️ PURE MONK FRUIT EXTRACT MODE
 
 Sugar input: ${sugar}g
-Estimated extract: ~${mg.toFixed(0)}mg
 
-⚠️ Extremely concentrated
+📊 Estimated potency range:
+• ${low.toFixed(1)} mg (high strength)
+• ${high.toFixed(1)} mg (lower strength)
+
+🧠 Reality:
+✔ Not used directly in baking
 ✔ Must be diluted into bulk sweetener
-✔ Recommended ratio:
-   1g extract → 200–300g sweetener base
 
-🚨 Do NOT use directly in baking.`;
+🍯 Best ratio:
+1g extract → 200–300g erythritol or allulose
+
+🧁 Always convert before use.`;
   }
 
   document.getElementById("result").innerText = message;

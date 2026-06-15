@@ -12,19 +12,23 @@
 <h2>🍪 Sugar Engine</h2>
 
 <div class="card">
-<label>Enter sugar amount (grams)</label>
+
+<label>Sugar (grams)</label>
 <input type="number" id="sugar">
 
-<label>Replace with</label>
+<label>Sweetener Type</label>
 <select id="type">
-  <option value="monkfruit">Monk Fruit</option>
+  <option value="monkfruit">Monk Fruit Blend</option>
   <option value="allulose">Allulose</option>
+  <option value="pure">Pure Monk Fruit Extract</option>
 </select>
 
 <button onclick="calc()">Generate Baking Plan</button>
 
-<h3 id="result"></h3>
-<p id="note"></p>
+</div>
+
+<div class="card">
+<pre id="result" style="white-space: pre-wrap;"></pre>
 </div>
 
 <script>
@@ -34,33 +38,65 @@ function calc() {
 
   if (!sugar || sugar <= 0) return;
 
-  let result = 0;
   let message = "";
 
   if (type === "monkfruit") {
-    result = sugar * 0.5;
+
+    let blend = sugar * 0.5;
 
     message =
-      `🧁 Baking Adjustment Plan:\n\n` +
-      `• Replace sugar with ~${result.toFixed(1)}g monk fruit blend\n` +
-      `• Sweetness: matches original level\n` +
-      `• Structure: slightly lighter texture\n\n` +
-      `Tip: If using pure extract, reduce further — blends behave more like sugar.`;
+`🧁 BAKING PLAN — MONK FRUIT BLEND
 
-  } else {
-    result = sugar * 1.3;
+Sugar input: ${sugar}g
+Replace with: ~${blend.toFixed(1)}g blend
+
+✔ Sweetness: matches sugar
+✔ Texture: slightly lighter
+✔ Best for cakes, cookies, muffins
+
+💡 Tip:
+Keep 10–20% real sugar if you want better browning.`;
+
+  }
+
+  else if (type === "allulose") {
+
+    let allulose = sugar * 1.3;
 
     message =
-      `🍯 Baking Adjustment Plan:\n\n` +
-      `• Replace sugar with ~${result.toFixed(1)}g allulose\n` +
-      `• Sweetness: slightly less intense than sugar\n` +
-      `• Structure: improves browning & moisture\n\n` +
-      `Tip: You can reduce sweetness intentionally — not all sugar must be replaced.`;
+`🍯 BAKING PLAN — ALLULOSE
+
+Sugar input: ${sugar}g
+Replace with: ~${allulose.toFixed(1)}g allulose
+
+✔ Texture: very close to sugar
+✔ Browning: good caramelisation
+✔ Sweetness: slightly lower than sugar
+
+💡 Tip:
+You can reduce sweetness intentionally for balance.`;
+
+  }
+
+  else if (type === "pure") {
+
+    let mg = sugar * 4;
+
+    message =
+`⚠️ PURE MONK FRUIT EXTRACT MODE
+
+Sugar input: ${sugar}g
+Estimated extract: ~${mg.toFixed(0)}mg
+
+⚠️ Extremely concentrated
+✔ Must be diluted into bulk sweetener
+✔ Recommended ratio:
+   1g extract → 200–300g sweetener base
+
+🚨 Do NOT use directly in baking.`;
   }
 
   document.getElementById("result").innerText = message;
-  document.getElementById("note").innerText =
-    "✔ Adjustment generated using Baker Engine v1";
 }
 </script>
 

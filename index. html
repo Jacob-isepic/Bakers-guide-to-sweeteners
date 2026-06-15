@@ -4,27 +4,28 @@
   <title>Baker Toolkit</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 <h1>🧁 Baker Sweetener Toolkit</h1>
 
 <div class="card">
-  <p>Choose a tool:</p>
+  <p>Select a tool:</p>
 </div>
 
 <a class="card" href="engine.html">
-🍪 Full Sweetener Engine
-<p>Balance sugar, allulose, monk fruit & stevia</p>
+  🍪 Sweetener Engine
+  <p>Full sugar + allulose + monk fruit system</p>
 </a>
 
 <a class="card" href="monkfruit.html">
-🍬 Monk Fruit Converter
-<p>Pure extract sweetness conversion</p>
+  🍬 Monk Fruit Converter
+  <p>Pure extract sweetness calculator</p>
 </a>
 
 <a class="card" href="allulose.html">
-🍯 Allulose Calculator
-<p>Structure-safe sugar replacement</p>
+  🍯 Allulose Calculator
+  <p>Structure-safe sugar replacement</p>
 </a>
 
 </body>

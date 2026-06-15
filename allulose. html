@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Allulose Tool</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<h2>🍯 Allulose Calculator</h2>
+
+<p>Replace sugar with allulose while keeping baking structure.</p>
+
+<input id="sugar" type="number" placeholder="Sugar (g)">
+<input id="replace" type="number" placeholder="Replace %">
+
+<button onclick="calc()">Calculate</button>
+
+<div id="result"></div>
+
+<script>
+function calc() {
+  let sugar = Number(document.getElementById("sugar").value);
+  let replace = Number(document.getElementById("replace").value) / 100;
+
+  let allulose = (sugar * replace) / 0.7;
+  let kept = sugar * (1 - replace);
+
+  document.getElementById("result").innerHTML =
+    "🥄 Sugar kept: " + kept.toFixed(1) + "g<br>" +
+    "🍯 Allulose: " + allulose.toFixed(1) + "g";
+}
+</script>
+
+</body>
+</html>

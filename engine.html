@@ -13,12 +13,12 @@
 
 <div class="card">
 
-<input type="number" id="sugar" placeholder="Sugar grams">
+<input type="number" id="sugar" placeholder="Sugar (g)">
 
 <select id="type">
   <option value="blend">Monk Fruit Blend</option>
   <option value="allulose">Allulose</option>
-  <option value="pure">Pure Extract</option>
+  <option value="pure">Pure Extract (Hybrid System)</option>
 </select>
 
 <button onclick="calc()">Convert</button>
@@ -26,10 +26,11 @@
 </div>
 
 <div class="card">
-<pre id="result"></pre>
+<pre id="out"></pre>
 </div>
 
 <script>
+
 function calc() {
 
   let sugar = Number(document.getElementById("sugar").value);
@@ -37,25 +38,63 @@ function calc() {
 
   if (!sugar) return;
 
-  let out = "";
+  let text = "";
 
+  // ================= BLEND =================
   if (type === "blend") {
-    out = `Blend: ${sugar}g (1:1 replacement)`;
+    text =
+`🍬 MONK FRUIT BLEND
+
+Original sugar: ${sugar}g
+Replace: ${sugar}g blend (1:1)
+
+✔ Maintains structure
+✔ Simple swap
+⚠ Slight browning reduction`;
   }
 
-  if (type === "allulose") {
-    out = `Allulose: ${(sugar * 1.05).toFixed(1)}g`;
+  // ================= ALLULOSE =================
+  else if (type === "allulose") {
+    text =
+`🍯 ALLULOSE
+
+Original sugar: ${sugar}g
+Replace: ${(sugar * 1.05).toFixed(1)}g allulose
+
+✔ Better moisture retention
+✔ Good browning
+💡 Cookies: +5% butter improves chew`;
   }
 
-  if (type === "pure") {
-    out =
-`Pure Extract:
-DO NOT use directly
-Mix into bulk sweetener`;
+  // ================= PURE HYBRID SYSTEM =================
+  else if (type === "pure") {
+
+    let structureSugar = Math.round(sugar * 0.6);
+    let extract = (sugar * 0.001).toFixed(2);
+
+    text =
+`⚗️ PURE EXTRACT HYBRID SYSTEM
+
+Original sugar: ${sugar}g
+
+🧁 Recommended split:
+- ${structureSugar}g sugar (structure + bulk)
+- ${extract}g pure monk fruit extract (sweetness)
+
+✔ Keeps baking structure intact
+✔ Uses extract safely (tiny amounts only)
+✔ Prevents dryness from full sugar removal
+
+💡 Why this works:
+Sugar = structure + texture
+Extract = sweetness only
+
+⚠ Never use extract alone`;
   }
 
-  document.getElementById("result").innerText = out;
+  document.getElementById("out").innerText = text;
 }
+
 </script>
 
 </body>

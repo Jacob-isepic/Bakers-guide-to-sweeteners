@@ -1,10 +1,30 @@
-body {
-  font-family: Arial;
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baker AI</title>
+
+<style>
+
+/* HARD RESET */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
   margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: Arial;
   background: #f3f4f6;
-  height: 100vh;
+}
+
+/* APP WRAPPER */
+body {
   display: flex;
   flex-direction: column;
+  height: 100vh;
 }
 
 /* HEADER */
@@ -13,30 +33,29 @@ h2 {
   padding: 12px;
   background: white;
   border-bottom: 1px solid #e5e5e5;
-  flex-shrink: 0;
 }
 
 /* CHAT AREA */
 .chat {
   flex: 1;
-  overflow-y: auto;
-  padding: 12px;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  padding: 12px;
+  overflow-y: auto;
+  background: #f3f4f6;
 }
 
-/* MESSAGE BUBBLES */
+/* MESSAGE BOX */
 .msg {
   max-width: 85%;
   padding: 12px;
   border-radius: 12px;
   line-height: 1.4;
-  white-space: normal;
   word-wrap: break-word;
 }
 
-/* USER */
+/* USER MESSAGE */
 .user {
   background: #dbeafe;
   align-self: flex-end;
@@ -44,7 +63,7 @@ h2 {
   font-weight: 600;
 }
 
-/* AI */
+/* AI MESSAGE */
 .ai {
   background: white;
   border: 1px solid #e5e7eb;
@@ -58,7 +77,6 @@ h2 {
   padding: 10px;
   background: white;
   border-top: 1px solid #e5e5e5;
-  flex-shrink: 0;
 }
 
 input {
@@ -67,6 +85,7 @@ input {
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 10px;
+  outline: none;
 }
 
 button {
@@ -76,3 +95,88 @@ button {
   color: white;
   border-radius: 10px;
 }
+
+</style>
+</head>
+
+<body>
+
+<h2>🧠 Baker AI Assistant</h2>
+
+<div class="chat" id="chat"></div>
+
+<div class="bar">
+  <input id="input" type="text" placeholder="Talk to Baker AI..." autocomplete="off">
+  <button onclick="send()">Send</button>
+</div>
+
+<script>
+
+let context = {
+  lastType: "general",
+  lastIngredients: {}
+};
+
+function send() {
+  let text = document.getElementById("input").value.trim();
+  if (!text) return;
+
+  add("You", text, "user");
+  add("Baker AI", brain(text), "ai");
+
+  document.getElementById("input").value = "";
+}
+
+function brain(text) {
+
+  let t = text.toLowerCase();
+
+  let sugar = extract(t, "sugar");
+  let flour = extract(t, "flour");
+  let butter = extract(t, "butter");
+  let eggs = extract(t, "egg");
+
+  let type = context.lastType;
+
+  if (t.includes("cookie")) type = "cookie";
+  else if (t.includes("cake")) type = "cake";
+  else if (t.includes("brownie")) type = "brownie";
+
+  context.lastType = type;
+
+  return `
+🧠 BAKER AI (${type.toUpperCase()})
+
+• Sugar: ${sugar || "?"}
+• Flour: ${flour || "?"}
+• Butter: ${butter || "?"}
+• Eggs: ${eggs || "?"}
+
+🍪 Status:
+Layout fixed version running correctly.
+
+💡 Try:
+"rewrite recipe"
+`;
+}
+
+function extract(text, word) {
+  let m = text.match(new RegExp("(\\d+)\\s*g\\s*" + word));
+  return m ? Number(m[1]) : 0;
+}
+
+function add(sender, text, cls) {
+
+  let div = document.createElement("div");
+  div.className = "msg " + cls;
+
+  div.innerHTML = `<b>${sender}</b><br><br>${text}`;
+
+  document.getElementById("chat").appendChild(div);
+  document.getElementById("chat").scrollTop = 999999;
+}
+
+</script>
+
+</body>
+</html>

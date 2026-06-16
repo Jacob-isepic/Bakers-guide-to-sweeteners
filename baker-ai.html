@@ -15,7 +15,6 @@ body {
 h2 {
   padding: 10px;
   margin: 0;
-  background: #fff;
 }
 
 .chat {
@@ -30,14 +29,8 @@ h2 {
   padding: 6px;
 }
 
-.user {
-  font-weight: bold;
-  color: #111;
-}
-
-.ai {
-  color: #0a7;
-}
+.user { font-weight: bold; }
+.ai { color: #0a7; }
 
 .bar {
   display: flex;
@@ -59,10 +52,6 @@ input {
   outline: none;
   color: black;
   background: white;
-}
-
-input:focus {
-  border-color: #0a7;
 }
 
 button {
@@ -89,11 +78,13 @@ button {
 
 <script>
 
+// ================= MEMORY =================
 let context = {
   lastType: "general",
   lastIngredients: {}
 };
 
+// ================= CHAT =================
 function send() {
 
   let text = document.getElementById("input").value.trim();
@@ -108,7 +99,7 @@ function send() {
   document.getElementById("input").value = "";
 }
 
-// ================= AI BRAIN =================
+// ================= BRAIN =================
 function brain(text) {
 
   let t = text.toLowerCase();
@@ -130,7 +121,6 @@ function brain(text) {
 
   context.lastType = type;
 
-  // REWRITE MODE
   if (t.includes("rewrite") || t.includes("fix") || t.includes("improve")) {
     return rewrite(type, context.lastIngredients);
   }
@@ -152,70 +142,103 @@ function rewrite(type, ing) {
   return `
 🧠 RECIPE REWRITE (${type.toUpperCase()})
 
-Original sugar: ${s}g
+🍬 Sugar:
+${s}g → ${newSugar}g (structure)
++ ${extract}g monk fruit extract (sweetness)
 
-• ${newSugar}g sugar (structure)
-• ${extract}g monk fruit extract (sweetness)
-• Flour: ${f || "same"}
-• Butter: ${b || "same"}
-• Eggs: ${e || "same"}
+🌾 Flour: ${f || "same"}
+🧈 Butter: ${b || "same"}
+🥚 Eggs: ${e || "same"}
 
 ✨ Result:
-Better texture stability + balanced sweetness
+Better structure + improved sweetness balance
 
-Ask: "make steps for this" if you want full method
+Say "make steps" for full method
 `;
 }
 
 // ================= ANALYZE =================
 function analyze(type, sugar, flour, butter, eggs) {
 
+  let sugarType = detectSugarType();
+  let flourType = detectFlourType();
+
   let score = 50;
 
-  if (sugar && flour) score += 10;
+  if (sugarType === "brown") score += 8;
+  if (sugarType === "icing") score -= 5;
+
+  if (flourType === "bread") score += 10;
+  if (flourType === "cake") score -= 5;
+
   if (butter > 80) score += 10;
   if (eggs >= 2) score += 10;
 
   let texture = "Balanced bake";
 
   if (type === "cookie") {
-    texture = sugar > flour * 0.7 ? "Soft chewy cookies" : "Crispier cookies";
+    texture = flourType === "bread"
+      ? "Chewy dense cookies"
+      : "Classic cookie texture";
   }
 
   if (type === "cake") {
-    texture = eggs >= 3 ? "Light airy cake" : "Denser cake";
+    texture = flourType === "cake"
+      ? "Soft fine crumb cake"
+      : "Standard cake structure";
   }
 
   if (type === "brownie") {
-    texture = butter > sugar * 0.5 ? "Fudgy brownie" : "Cakey brownie";
+    texture = sugarType === "brown"
+      ? "Fudgy caramel brownie"
+      : "Standard brownie texture";
   }
 
   return `
 🧠 BAKER AI (${type.toUpperCase()})
 
-• Sugar: ${sugar || context.lastIngredients.sugar || "?"}
-• Flour: ${flour || context.lastIngredients.flour || "?"}
-• Butter: ${butter || context.lastIngredients.butter || "?"}
-• Eggs: ${eggs || context.lastIngredients.eggs || "?"}
+🍬 Sugar type: ${sugarType}
+🌾 Flour type: ${flourType}
+
+🧈 Butter: ${butter || "?"}
+🥚 Eggs: ${eggs || "?"}
 
 ⚖️ Score: ${score}/100
 
 🍪 Texture:
 ${texture}
 
-💬 Try:
-- "rewrite it"
-- "fix this recipe"
-- "improve cookie"
+💡 Try:
+"rewrite this recipe"
 `;
 }
 
+// ================= TYPE DETECTORS =================
+function detectSugarType() {
+  let t = lastText.toLowerCase();
+  if (t.includes("brown sugar")) return "brown";
+  if (t.includes("icing sugar") || t.includes("powdered sugar")) return "icing";
+  if (t.includes("granulated sugar")) return "granulated";
+  return "white";
+}
+
+function detectFlourType() {
+  let t = lastText.toLowerCase();
+  if (t.includes("bread flour")) return "bread";
+  if (t.includes("cake flour")) return "cake";
+  return "all-purpose";
+}
+
 // ================= HELPERS =================
+let lastText = "";
+
 function extract(text, word) {
+  lastText = text;
   let m = text.match(new RegExp("(\\d+)\\s*g\\s*" + word));
   return m ? Number(m[1]) : 0;
 }
 
+// ================= UI =================
 function add(sender, text, cls) {
   let div = document.createElement("div");
   div.className = "msg " + cls;

@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>Baker AI Visual</title>
+<title>Baker AI</title>
 
 <style>
 html, body {
@@ -22,14 +23,14 @@ header {
   font-weight: bold;
 }
 
-/* MAIN LAYOUT */
+/* MAIN WRAPPER */
 .container {
+  height: 100dvh;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 52px);
 }
 
-/* TOP CONTROLS */
+/* TOP BUTTON BAR */
 .controls {
   display: flex;
   gap: 8px;
@@ -48,26 +49,10 @@ button {
   font-size: 14px;
 }
 
-/* INPUT */
-.inputBar {
-  display: flex;
-  padding: 10px;
-  gap: 8px;
-  background: white;
-  border-top: 1px solid #ddd;
-}
-
-input {
-  flex: 1;
-  padding: 12px;
-  font-size: 16px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-}
-
 /* OUTPUT AREA */
 .output {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   padding: 12px;
   display: flex;
@@ -88,14 +73,21 @@ input {
   margin-bottom: 8px;
 }
 
-/* TAGS */
-.tag {
-  display: inline-block;
-  padding: 4px 8px;
-  margin: 2px;
-  background: #e0f2fe;
-  border-radius: 6px;
-  font-size: 12px;
+/* INPUT BAR */
+.inputBar {
+  display: flex;
+  padding: 10px;
+  gap: 8px;
+  background: white;
+  border-top: 1px solid #ddd;
+}
+
+input {
+  flex: 1;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
 }
 </style>
 
@@ -103,11 +95,11 @@ input {
 
 <body>
 
-<header>🍰 Baker AI Visual Studio</header>
+<header>🍰 Baker AI</header>
 
 <div class="container">
 
-  <!-- MODE BUTTONS -->
+  <!-- BUTTONS -->
   <div class="controls">
     <button onclick="setMode('blend')">Blend Mode</button>
     <button onclick="setMode('pure')">Pure Mode</button>
@@ -120,4 +112,84 @@ input {
 
   <!-- INPUT -->
   <div class="inputBar">
-    <input id="input" placeholder="e.g. convert 100
+    <input id="input" placeholder="e.g. convert 100g sugar for cake" />
+    <button onclick="run()">Send</button>
+  </div>
+
+</div>
+
+<script>
+
+/* STATE */
+let state = {
+  mode: "blend",
+  last: { sugar: 0, flour: 0, butter: 0 },
+  type: "general"
+};
+
+/* MODE BUTTONS */
+function setMode(m) {
+  state.mode = m;
+  render("⚙️ Mode Changed", "Now using: " + m + " mode");
+}
+
+/* SETTINGS */
+function showSettings() {
+  render("⚙️ Settings", `
+Current mode: ${state.mode}
+
+Blend = balanced sweetness  
+Pure = stronger extract  
+Extract = strongest reduction  
+`);
+}
+
+/* MAIN */
+function run() {
+  let text = document.getElementById("input").value.trim();
+  if (!text) return;
+
+  process(text);
+  document.getElementById("input").value = "";
+}
+
+function process(text) {
+
+  let t = text.toLowerCase();
+
+  if (t.includes("cake")) state.type = "cake";
+  if (t.includes("cookie")) state.type = "cookie";
+  if (t.includes("brownie")) state.type = "brownie";
+
+  let sugar = extract(text, "sugar");
+  let flour = extract(text, "flour");
+  let butter = extract(text, "butter");
+
+  if (sugar || flour || butter) {
+    state.last = { sugar, flour, butter };
+  }
+
+  if (t.includes("convert") || t.includes("rewrite")) {
+    return convert();
+  }
+
+  analyze();
+}
+
+/* CONVERTER */
+function convert() {
+
+  let s = state.last.sugar;
+  let f = state.last.flour;
+  let b = state.last.butter;
+
+  let ratio =
+    state.mode === "blend" ? 0.6 :
+    state.mode === "pure" ? 0.4 : 0.25;
+
+  let mult =
+    state.mode === "blend" ? 0.0008 :
+    state.mode === "pure" ? 0.0012 : 0.002;
+
+  let structure = Math.round(s * ratio);
+  let extract = (s *

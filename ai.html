@@ -3,71 +3,132 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>AI Baking Fixer</title>
+<title>Recipe Rewrite AI</title>
 <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
 
-<h2>🧠 AI Baking Fixer</h2>
+<h2>🧠 Recipe Rewrite AI</h2>
 
 <div class="card">
 
-<label>Recipe</label>
-<textarea id="recipe" rows="6" style="width:100%">
+<label>Paste Recipe</label>
+<textarea id="input" rows="10" style="width:100%">
+Example:
 200g sugar
 100g butter
 2 eggs
 250g flour
+1 tsp vanilla
 </textarea>
 
-<label>Sweetener</label>
+<label>Sweetener Type</label>
 <select id="type">
-  <option value="monkfruit">Monk Fruit Blend</option>
+  <option value="blend">Monk Fruit Blend</option>
   <option value="allulose">Allulose</option>
   <option value="pure">Pure Extract</option>
 </select>
 
-<button onclick="fix()">Fix Recipe</button>
+<button onclick="rewrite()">Rewrite Recipe</button>
 
 </div>
 
 <div class="card">
-<pre id="out" style="white-space: pre-wrap;"></pre>
+<pre id="output" style="white-space: pre-wrap;"></pre>
 </div>
 
 <script>
-function fix() {
+function rewrite() {
 
-  let text = document.getElementById("recipe").value;
+  let text = document.getElementById("input").value;
   let type = document.getElementById("type").value;
 
   let sugarMatch = text.match(/(\d+)\s*g\s*sugar/i);
   let sugar = sugarMatch ? Number(sugarMatch[1]) : 0;
 
   if (!sugar) {
-    document.getElementById("out").innerText = "No sugar found";
+    document.getElementById("output").innerText = "❌ No sugar found in recipe";
     return;
   }
 
-  let sweet = 0;
+  // =========================
+  // SWEETENER REPLACEMENT
+  // =========================
+  let newSugarLine = "";
 
-  if (type === "monkfruit") sweet = sugar * 0.5;
-  if (type === "allulose") sweet = sugar * 1.3;
-  if (type === "pure") sweet = sugar * 0.001;
+  if (type === "blend") {
+    newSugarLine = `${sugar}g monk fruit blend (1:1 sugar replacement)`;
+  }
 
-  let structure = "Adjust based on recipe type";
+  if (type === "allulose") {
+    newSugarLine = `${(sugar * 1.05).toFixed(0)}g allulose`;
+  }
 
-  document.getElementById("out").innerText =
-`🧠 FIXED RECIPE
+  if (type === "pure") {
+    newSugarLine =
+`⚠ DO NOT USE PURE EXTRACT DIRECTLY
+Replace sugar with:
+- 200g allulose (or similar bulk sweetener)
+- + tiny amount extract (pinch for sweetness)`;
+  }
 
-Sugar: ${sugar}g
-Sweetener: ${sweet.toFixed(2)}g (${type})
+  // =========================
+  // BASIC STRUCTURE ADJUSTMENTS
+  // =========================
+  let adjustment = "";
 
-Structure note:
-${structure}`;
+  if (text.toLowerCase().includes("cookie")) {
+    adjustment =
+`🍪 Cookie adjustments:
+- Add +5–10% butter for softness
+- Slightly reduce bake time if using allulose`;
+  }
+
+  else if (text.toLowerCase().includes("cake")) {
+    adjustment =
+`🎂 Cake adjustments:
+- Keep liquids same
+- Add 1 tbsp milk if batter looks dry (allulose only)
+- Do not overmix`;
+  }
+
+  else if (text.toLowerCase().includes("brownie")) {
+    adjustment =
+`🍫 Brownie adjustments:
+- Slightly reduce bake time
+- +5% fat improves fudginess
+- Do not overbake`;
+  }
+
+  else {
+    adjustment =
+`🧁 General adjustments:
+- Monitor moisture (sweeteners behave differently)
+- Do not change flour unless necessary
+- Test bake small batch first`;
+  }
+
+  // =========================
+  // OUTPUT
+  // =========================
+  document.getElementById("output").innerText =
+`🧠 REWRITTEN RECIPE
+
+──────── ORIGINAL SUGAR ────────
+${sugar}g sugar
+
+──────── REPLACED ────────
+${newSugarLine}
+
+──────── OTHER INGREDIENTS ────────
+${text.replace(/(\d+)\s*g\s*sugar/i, "").trim()}
+
+──────── STRUCTURE FIXES ────────
+${adjustment}
+
+✔ Recipe optimised for alternative sweeteners
+`;
 }
 </script>
 

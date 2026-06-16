@@ -3,130 +3,128 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>Baker AI</title>
+<title>Baker AI Engine v8</title>
 
 <style>
 html, body {
-  margin: 0;
-  font-family: Arial;
-  height: 100%;
-  background: #f4f4f6;
+  margin:0;
+  font-family:Arial;
+  height:100%;
+  background:#f4f4f6;
 }
 
-header {
-  padding: 14px;
-  background: white;
-  border-bottom: 1px solid #ddd;
-  font-weight: bold;
+header{
+  padding:14px;
+  background:white;
+  border-bottom:1px solid #ddd;
+  font-weight:bold;
 }
 
-.container {
-  height: 100dvh;
-  display: flex;
-  flex-direction: column;
+.container{
+  height:100dvh;
+  display:flex;
+  flex-direction:column;
 }
 
-.topbar {
-  display: flex;
-  gap: 8px;
-  padding: 10px;
-  background: white;
-  border-bottom: 1px solid #ddd;
+.topbar{
+  display:flex;
+  gap:8px;
+  padding:10px;
+  background:white;
+  border-bottom:1px solid #ddd;
 }
 
-button {
-  padding: 10px;
-  border: none;
-  border-radius: 8px;
-  background: #10b981;
-  color: white;
-  font-size: 14px;
+button{
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  background:#10b981;
+  color:white;
 }
 
-.output {
-  flex: 1;
-  overflow-y: auto;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.output{
+  flex:1;
+  overflow-y:auto;
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
 }
 
-.card {
-  background: white;
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid #ddd;
-  white-space: pre-wrap;
+.card{
+  background:white;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid #ddd;
+  white-space:pre-wrap;
 }
 
-.inputBar {
-  display: flex;
-  padding: 10px;
-  gap: 8px;
-  background: white;
-  border-top: 1px solid #ddd;
+.inputBar{
+  display:flex;
+  padding:10px;
+  gap:8px;
+  background:white;
+  border-top:1px solid #ddd;
 }
 
-input {
-  flex: 1;
-  padding: 12px;
-  font-size: 16px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
+input{
+  flex:1;
+  padding:12px;
+  font-size:16px;
+  border-radius:10px;
+  border:1px solid #ccc;
 }
 
-/* MODALS */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  display: none;
-  align-items: center;
-  justify-content: center;
+/* MODAL */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.5);
+  display:none;
+  align-items:center;
+  justify-content:center;
 }
 
-.panel {
-  background: white;
-  width: 90%;
-  max-height: 80%;
-  overflow-y: auto;
-  border-radius: 12px;
-  padding: 12px;
+.panel{
+  background:white;
+  width:90%;
+  padding:12px;
+  border-radius:12px;
+  max-height:80%;
+  overflow:auto;
 }
 
-.option {
-  display: inline-block;
-  padding: 8px 10px;
-  margin: 4px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  cursor: pointer;
+.option{
+  display:inline-block;
+  padding:8px 10px;
+  margin:4px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  cursor:pointer;
 }
 
-.active {
-  background: #10b981;
-  color: white;
+.active{
+  background:#10b981;
+  color:white;
 }
 </style>
 </head>
 
 <body>
 
-<header>🍰 Baker AI</header>
+<header>🍰 Baker AI Engine v8</header>
 
 <div class="container">
 
 <div class="topbar">
   <button onclick="openSettings()">⚙ Settings</button>
   <button onclick="toggleChef()">👨‍🍳 Chef Mode</button>
-  <button onclick="openHelp()">❓ Help</button>
 </div>
 
 <div class="output" id="output"></div>
 
 <div class="inputBar">
-  <input id="input" placeholder="e.g. convert 200g sugar for cookies" />
+  <input id="input" placeholder="e.g. convert 200g sugar for cookies"/>
   <button onclick="run()">Send</button>
 </div>
 
@@ -136,152 +134,174 @@ input {
 <div class="modal" id="settings">
   <div class="panel">
 
-    <h3>⚖ Units</h3>
-    <div>
-      <span class="option" onclick="setUnit('g')">grams</span>
-      <span class="option" onclick="setUnit('cup')">cups</span>
-      <span class="option" onclick="setUnit('tbsp')">tbsp</span>
-      <span class="option" onclick="setUnit('tsp')">tsp</span>
-      <span class="option" onclick="setUnit('half')">½ cup</span>
-    </div>
-
-    <h3>🍬 Ingredients</h3>
+    <h3>🍪 Ingredients</h3>
     <div id="ingredients"></div>
 
     <br>
     <button onclick="closeSettings()">Close</button>
-  </div>
-</div>
 
-<!-- HELP -->
-<div class="modal" id="help">
-  <div class="panel">
-    <h3>❓ Help Guide</h3>
-
-    <p><b>👨‍🍳 Chef Mode</b><br>Turns AI into a baking assistant that explains texture + ingredient effects.</p>
-
-    <p><b>⚖ Units</b><br>Choose grams, cups, tbsp, tsp, or ½ cup.</p>
-
-    <p><b>🍬 Ingredients</b><br>Click to enable/disable ingredients (green = active).</p>
-
-    <p><b>🧠 Try typing:</b><br>
-    • convert 200g sugar<br>
-    • I’m making cookies<br>
-    • use brown sugar instead</p>
-
-    <button onclick="closeHelp()">Close</button>
   </div>
 </div>
 
 <script>
 
+/* ================= STATE ================= */
+
 let state = {
-  chef: false,
-  unit: "g",
-  ingredients: {
-    "white sugar": false,
-    "brown sugar": false,
-    "icing sugar": false,
-    "monkfruit": false,
-    "all purpose flour": false,
-    "cake flour": false,
-    "bread flour": false,
-    "salted butter": false,
-    "unsalted butter": false
+  chef:false,
+  ingredients:{
+    "white sugar":false,
+    "brown sugar":false,
+    "icing sugar":false,
+    "monkfruit":false,
+    "all purpose flour":false,
+    "cake flour":false,
+    "bread flour":false,
+    "salted butter":false,
+    "unsalted butter":false
   }
 };
 
-/* INIT */
-window.onload = () => log("System", "Baker AI ready ✔");
+/* ================= OPEN/CLOSE ================= */
 
-/* UI */
 function openSettings(){
   document.getElementById("settings").style.display="flex";
-  renderIngredients();
+  render();
 }
 
 function closeSettings(){
   document.getElementById("settings").style.display="none";
 }
 
-function openHelp(){
-  document.getElementById("help").style.display="flex";
-}
-
-function closeHelp(){
-  document.getElementById("help").style.display="none";
-}
-
 function toggleChef(){
-  state.chef = !state.chef;
+  state.chef=!state.chef;
   log("Chef Mode", state.chef ? "ON 👨‍🍳" : "OFF");
 }
 
-function setUnit(u){
-  state.unit = u;
-  log("Unit", "Set to " + u);
-}
+/* ================= INGREDIENT UI ================= */
 
-/* INGREDIENTS */
-function renderIngredients(){
-  let box = document.getElementById("ingredients");
-  box.innerHTML = "";
+function render(){
+  let box=document.getElementById("ingredients");
+  box.innerHTML="";
 
   for(let k in state.ingredients){
-    let el = document.createElement("div");
-    el.className = "option" + (state.ingredients[k] ? " active" : "");
-    el.innerText = k;
+    let el=document.createElement("div");
+    el.className="option"+(state.ingredients[k]?" active":"");
+    el.innerText=k;
 
-    el.onclick = () => {
-      state.ingredients[k] = !state.ingredients[k];
-      renderIngredients();
+    el.onclick=()=>{
+      state.ingredients[k]=!state.ingredients[k];
+      render();
     };
 
     box.appendChild(el);
   }
 }
 
-/* MAIN */
-function run(){
-  let text = document.getElementById("input").value.trim();
-  if(!text) return;
+/* ================= ENGINE ================= */
 
-  log("You", text);
-  log("Baker AI", process(text));
-  document.getElementById("input").value = "";
+function run(){
+  let text=document.getElementById("input").value.trim();
+  if(!text)return;
+
+  log("You",text);
+  log("Baker AI",process(text));
+  document.getElementById("input").value="";
 }
+
+function extractAmount(t){
+  let m=t.match(/(\d+)/);
+  return m?Number(m[1]):100;
+}
+
+/* ================= REAL ENGINE ================= */
 
 function process(text){
 
-  let amount = text.match(/\d+/);
-  amount = amount ? amount[0] : "unknown";
+  let baseSugar = extractAmount(text);
 
-  let selected = Object.keys(state.ingredients).filter(i => state.ingredients[i]);
+  let sugarMultiplier = 1.0;
+  let moisture = 1.0;
+  let sweetness = 1.0;
+  let structure = 1.0;
 
-  if(state.chef){
-    return `👨‍🍳 CHEF MODE
-
-I see you're working with ${amount} (${state.unit})
-
-Selected ingredients:
-${selected.join(", ") || "none"}
-
-💡 Chef insight:
-I’ll adjust sweetness, structure, and texture based on your ingredient choices.`;
+  /* 🍬 SUGAR LOGIC */
+  if(state.ingredients["brown sugar"]){
+    moisture += 0.15;
+    sweetness -= 0.05;
   }
 
-  return `🧠 STANDARD MODE
+  if(state.ingredients["icing sugar"]){
+    sweetness += 0.2;
+    structure -= 0.1;
+  }
 
-Amount: ${amount} (${state.unit})
+  if(state.ingredients["monkfruit"]){
+    sweetness -= 0.6;
+  }
 
-Tip: turn on Chef Mode for baking guidance.`;
+  /* 🌾 FLOUR LOGIC */
+  if(state.ingredients["cake flour"]){
+    structure -= 0.2;
+  }
+
+  if(state.ingredients["bread flour"]){
+    structure += 0.2;
+  }
+
+  /* 🧈 BUTTER LOGIC */
+  if(state.ingredients["unsalted butter"]){
+    moisture += 0.05;
+  }
+
+  if(state.ingredients["salted butter"]){
+    structure += 0.05;
+  }
+
+  let finalSugar = baseSugar * sweetness;
+
+  let texture =
+    moisture > 1.1 ? "very soft / moist" :
+    structure > 1.1 ? "chewy / structured" :
+    "balanced";
+
+  if(state.chef){
+
+    return `
+👨‍🍳 CHEF MODE ENGINE
+
+Base sugar: ${baseSugar}g
+Adjusted sugar: ${finalSugar.toFixed(1)}g
+
+🍪 Texture prediction:
+${texture}
+
+📊 Ingredient effects:
+- moisture: ${moisture.toFixed(2)}
+- structure: ${structure.toFixed(2)}
+- sweetness: ${sweetness.toFixed(2)}
+
+💡 Insight:
+Your ingredient choices are actively changing the recipe outcome.
+`;
+  }
+
+  return `
+🧠 STANDARD MODE
+
+Sugar: ${finalSugar.toFixed(1)}g
+Texture: ${texture}
+
+Turn on Chef Mode for deeper baking science.
+`;
 }
 
-/* LOG */
-function log(title,msg){
+/* ================= LOG ================= */
+
+function log(t,m){
   let d=document.createElement("div");
   d.className="card";
-  d.innerText=title + "\n\n" + msg;
+  d.innerText=t+"\n\n"+m;
   document.getElementById("output").appendChild(d);
   document.getElementById("output").scrollTop=999999;
 }

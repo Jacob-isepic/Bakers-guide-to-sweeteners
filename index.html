@@ -3,38 +3,108 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Baker AI</title>
 
-<link rel="stylesheet" href="style.css">
-<link rel="manifest" href="manifest.json">
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #f3f4f6;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+h2 {
+  margin: 0;
+  padding: 12px;
+  background: white;
+  border-bottom: 1px solid #ddd;
+}
+
+.chat {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.msg {
+  max-width: 85%;
+  padding: 12px;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid #e5e5e5;
+  white-space: pre-wrap;
+}
+
+.user {
+  align-self: flex-end;
+  background: #dbeafe;
+  font-weight: bold;
+}
+
+.ai {
+  align-self: flex-start;
+}
+
+.bar {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  background: white;
+  border-top: 1px solid #ddd;
+}
+
+input {
+  flex: 1;
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+
+button {
+  padding: 12px 16px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 10px;
+}
+</style>
 
 </head>
 
 <body>
 
-<h1>🧁 Baker AI</h1>
+<h2>🧠 Baker AI</h2>
 
-<div class="card">
-Smart baking system with AI recipe analysis, conversion, and structure prediction.
-</div>
+<div class="chat" id="chat"></div>
 
-<div class="grid">
-
-<a class="tile" href="engine.html">🍪<br><b>Engine</b></a>
-<a class="tile" href="monkfruit.html">🍬<br><b>Monk Fruit</b></a>
-<a class="tile" href="allulose.html">🍯<br><b>Allulose</b></a>
-<a class="tile" href="converter.html">🧁<br><b>Converter</b></a>
-
-<a class="tile" href="baker-ai.html">🧠<br><b>Baker AI Core</b></a>
-
-<a class="tile" href="settings.html">⚙️<br><b>Settings</b></a>
-
+<div class="bar">
+  <input id="input" placeholder="Type..." />
+  <button onclick="send()">Send</button>
 </div>
 
 <script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js");
+function send() {
+  let input = document.getElementById("input");
+  let text = input.value.trim();
+  if (!text) return;
+
+  add("You", text, "user");
+  add("AI", "System running correctly. UI restored.", "ai");
+
+  input.value = "";
+}
+
+function add(sender, text, cls) {
+  let div = document.createElement("div");
+  div.className = "msg " + cls;
+  div.innerHTML = `<b>${sender}</b><br><br>${text}`;
+  document.getElementById("chat").appendChild(div);
 }
 </script>
 

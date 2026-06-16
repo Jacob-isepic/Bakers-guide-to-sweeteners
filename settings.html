@@ -3,10 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Settings</title>
 <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
@@ -15,23 +13,18 @@
 
 <div class="card">
 
-<h3>Default Sweetener</h3>
 <select id="sweetener">
-  <option value="monkfruit">Monk Fruit Blend</option>
+  <option value="monkfruit">Monk Fruit</option>
   <option value="allulose">Allulose</option>
-  <option value="pure">Pure Extract</option>
+  <option value="pure">Pure</option>
 </select>
 
-<h3>Sweetness Mode</h3>
 <select id="mode">
   <option value="normal">Normal</option>
-  <option value="reduced">Reduced</option>
-  <option value="lowcarb">Low Carb</option>
+  <option value="low">Low Carb</option>
 </select>
 
-<button onclick="save()">Save Settings</button>
-
-<pre id="status"></pre>
+<button onclick="save()">Save</button>
 
 </div>
 
@@ -39,16 +32,14 @@
 function save() {
   localStorage.setItem("sweetener", document.getElementById("sweetener").value);
   localStorage.setItem("mode", document.getElementById("mode").value);
-
-  document.getElementById("status").innerText = "Saved ✔";
 }
 
 window.onload = function() {
   document.getElementById("sweetener").value =
-    localStorage.getItem("sweetener") || "monkfruit";
+  localStorage.getItem("sweetener") || "monkfruit";
 
   document.getElementById("mode").value =
-    localStorage.getItem("mode") || "normal";
+  localStorage.getItem("mode") || "normal";
 }
 </script>
 

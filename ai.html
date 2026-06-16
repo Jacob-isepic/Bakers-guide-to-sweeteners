@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Baking AI</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<h2>🧠 Smart Baking AI</h2>
+
+<div class="card">
+
+<label>Recipe Type</label>
+<select id="recipe">
+  <option value="cookies">Cookies</option>
+  <option value="cake">Cake</option>
+  <option value="brownies">Brownies</option>
+</select>
+
+<label>Sugar (grams)</label>
+<input type="number" id="sugar">
+
+<label>Sweetener</label>
+<select id="type">
+  <option value="monkfruit">Monk Fruit Blend</option>
+  <option value="allulose">Allulose</option>
+  <option value="pure">Pure Extract (Advanced)</option>
+</select>
+
+<button onclick="generate()">Generate Smart Plan</button>
+
+</div>
+
+<div class="card">
+<pre id="out" style="white-space: pre-wrap;"></pre>
+</div>
+
+<script>
+function generate() {
+
+  let sugar = Number(document.getElementById("sugar").value);
+  let recipe = document.getElementById("recipe").value;
+  let type = document.getElementById("type").value;
+
+  if (!sugar) return;
+
+  let sweetnessFactor = 1;
+  let structureFix = "";
+  let moistureFix = "";
+  let fatFix = "";
+  let resultSugar = 0;
+
+  // SWEETENER LOGIC
+  if (type === "monkfruit") sweetnessFactor = 0.5;
+  if (type === "allulose") sweetnessFactor = 1.3;
+  if (type === "pure") sweetnessFactor = 0.001; // basically negligible bulk
+
+  resultSugar = sugar * sweetnessFactor;
+
+  // STRUCTURE LOGIC BY RECIPE TYPE
+
+  if (recipe === "cookies") {
+    structureFix = "Slightly increase fat for softness";
+    moistureFix = "Do not add extra liquid";
+    fatFix = "+5–10% butter improves texture";
+  }
+
+  if (recipe === "cake") {
+    structureFix = "Maintain liquid ratio for rise";
+    moistureFix = "Add 1–2 tbsp extra milk if using allulose";
+    fatFix = "No fat change needed";
+  }
+
+  if (recipe === "brownies") {
+    structureFix = "Do not overmix batter";
+    moistureFix = "Allulose improves fudginess";
+    fatFix = "+5% fat improves chew";
+  }
+
+  // PURE EXTRACT WARNING
+  let extraWarning = "";
+  if (type === "pure") {
+    extraWarning =
+`⚠️ PURE EXTRACT MODE
+Must be diluted before use
+Recommended: 1g extract → 200–300g sweetener base
+
+`;
+  }
+
+  document.getElementById("out").innerText =
+`🧠 SMART BAKING PLAN
+
+Recipe: ${recipe}
+Sugar: ${sugar}g
+Sweetener result: ~${resultSugar.toFixed(2)}g (${type})
+
+────────────────────
+
+🧁 STRUCTURE ADJUSTMENT
+${structureFix}
+
+💧 MOISTURE ADJUSTMENT
+${moistureFix}
+
+🧈 FAT ADJUSTMENT
+${fatFix}
+
+────────────────────
+
+${extraWarning}
+✔ Optimised for texture + sweetness balance
+`;
+}
+</script>
+
+</body>
+</html>

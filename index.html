@@ -1,24 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Baker AI</title>
+
 <style>
-body {
+html, body {
   margin: 0;
+  padding: 0;
+  height: 100%;
   font-family: Arial;
   background: #f3f4f6;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
+  overflow: hidden;
 }
 
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* HEADER */
 h2 {
   margin: 0;
   padding: 12px;
   background: white;
   border-bottom: 1px solid #ddd;
+  flex-shrink: 0;
 }
 
+/* CHAT */
 .chat {
   flex: 1;
   overflow-y: auto;
@@ -28,31 +40,37 @@ h2 {
   gap: 10px;
 }
 
+/* MESSAGE */
 .msg {
   max-width: 85%;
   padding: 12px;
   border-radius: 12px;
   background: white;
-  border: 1px solid #e5e5e5;
-  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.4;
 }
 
+/* USER */
 .user {
   align-self: flex-end;
   background: #dbeafe;
   font-weight: bold;
 }
 
+/* AI */
 .ai {
   align-self: flex-start;
+  border: 1px solid #e5e5e5;
 }
 
+/* INPUT BAR */
 .bar {
   display: flex;
   gap: 8px;
   padding: 10px;
   background: white;
   border-top: 1px solid #ddd;
+  flex-shrink: 0;
 }
 
 input {
@@ -81,29 +99,54 @@ button {
 <div class="chat" id="chat"></div>
 
 <div class="bar">
-  <input id="input" placeholder="Type..." />
+  <input id="input" placeholder="Ask about baking..." />
   <button onclick="send()">Send</button>
 </div>
 
 <script>
+
+let context = {
+  lastType: "general",
+  lastIngredients: {}
+};
+
 function send() {
   let input = document.getElementById("input");
   let text = input.value.trim();
   if (!text) return;
 
   add("You", text, "user");
-  add("AI", "System running correctly. UI restored.", "ai");
+  add("Baker AI", brain(text), "ai");
 
   input.value = "";
 }
 
-function add(sender, text, cls) {
-  let div = document.createElement("div");
-  div.className = "msg " + cls;
-  div.innerHTML = `<b>${sender}</b><br><br>${text}`;
-  document.getElementById("chat").appendChild(div);
-}
-</script>
+function brain(text) {
 
-</body>
-</html>
+  let t = text.toLowerCase();
+
+  // detect recipe type
+  let type = context.lastType;
+
+  if (t.includes("cookie")) type = "cookie";
+  else if (t.includes("cake")) type = "cake";
+  else if (t.includes("brownie")) type = "brownie";
+
+  context.lastType = type;
+
+  // ingredient extraction
+  let sugar = extract(text, "sugar");
+  let flour = extract(text, "flour");
+  let butter = extract(text, "butter");
+  let eggs = extract(text, "egg");
+
+  if (sugar || flour || butter || eggs) {
+    context.lastIngredients = { sugar, flour, butter, eggs };
+  }
+
+  // rewrite mode
+  if (t.includes("rewrite") || t.includes("convert") || t.includes("improve")) {
+    return rewrite(type, context.lastIngredients);
+  }
+
+  return analyze(type, sugar,

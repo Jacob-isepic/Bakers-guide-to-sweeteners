@@ -3,58 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Baker App</title>
+<title>Baker AI</title>
+<link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<h1>🧁 Baker App</h1>
-<p style="text-align:center; color:gray;">Smart sweetener + baking system</p>
+<h1>🧁 Baker AI</h1>
 
 <div class="card">
-A baking tool that converts sugar into alternative sweeteners and now includes smart recipe adjustment for structure, moisture, and texture.
+Smart baking system: convert sugar, fix recipes, and optimize structure automatically.
 </div>
 
 <div class="grid">
 
-<a class="tile" href="engine.html">
-<div style="font-size:28px;">🍪</div>
-<b>Sugar Engine</b><br>
-<small>Convert sugar instantly</small>
-</a>
-
-<a class="tile" href="monkfruit.html">
-<div style="font-size:28px;">🍬</div>
-<b>Monk Fruit Guide</b><br>
-<small>Blends, extract & DIY</small>
-</a>
-
-<a class="tile" href="allulose.html">
-<div style="font-size:28px;">🍯</div>
-<b>Allulose Guide</b><br>
-<small>Baking structure control</small>
-</a>
-
-<a class="tile" href="converter.html">
-<div style="font-size:28px;">🧁</div>
-<b>Recipe Converter</b><br>
-<small>Basic conversion tool</small>
-</a>
-
-<a class="tile" href="ai.html">
-<div style="font-size:28px;">🧠</div>
-<b>Smart Baking AI</b><br>
-<small>Full recipe optimizer</small>
-</a>
-
-<a class="tile" href="settings.html">
-<div style="font-size:28px;">⚙️</div>
-<b>Settings</b><br>
-<small>App preferences</small>
-</a>
+<a class="tile" href="engine.html">🍪<br><b>Engine</b></a>
+<a class="tile" href="monkfruit.html">🍬<br><b>Monk Fruit</b></a>
+<a class="tile" href="allulose.html">🍯<br><b>Allulose</b></a>
+<a class="tile" href="converter.html">🧁<br><b>Converter</b></a>
+<a class="tile" href="ai.html">🧠<br><b>AI Fixer</b></a>
+<a class="tile" href="settings.html">⚙️<br><b>Settings</b></a>
 
 </div>
+
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js");
+}
+</script>
 
 </body>
 </html>

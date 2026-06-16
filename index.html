@@ -27,7 +27,6 @@ h2 {
   padding: 12px;
   background: white;
   border-bottom: 1px solid #ddd;
-  flex-shrink: 0;
 }
 
 /* CHAT */
@@ -46,39 +45,36 @@ h2 {
   padding: 12px;
   border-radius: 12px;
   background: white;
-  word-break: break-word;
   line-height: 1.4;
+  word-break: break-word;
 }
 
-/* USER */
 .user {
   align-self: flex-end;
   background: #dbeafe;
   font-weight: bold;
 }
 
-/* AI */
 .ai {
   align-self: flex-start;
   border: 1px solid #e5e5e5;
 }
 
-/* INPUT BAR */
+/* INPUT */
 .bar {
   display: flex;
   gap: 8px;
   padding: 10px;
   background: white;
   border-top: 1px solid #ddd;
-  flex-shrink: 0;
 }
 
 input {
   flex: 1;
   padding: 12px;
   font-size: 16px;
-  border: 1px solid #ccc;
   border-radius: 10px;
+  border: 1px solid #ccc;
 }
 
 button {
@@ -99,13 +95,13 @@ button {
 <div class="chat" id="chat"></div>
 
 <div class="bar">
-  <input id="input" placeholder="Ask about baking..." />
+  <input id="input" placeholder="Ask or paste recipe..." />
   <button onclick="send()">Send</button>
 </div>
 
 <script>
 
-let context = {
+let memory = {
   lastType: "general",
   lastIngredients: {}
 };
@@ -116,37 +112,137 @@ function send() {
   if (!text) return;
 
   add("You", text, "user");
-  add("Baker AI", brain(text), "ai");
+
+  let reply = brain(text);
+
+  add("Baker AI", reply, "ai");
 
   input.value = "";
 }
+
+/* ================= CORE BRAIN ================= */
 
 function brain(text) {
 
   let t = text.toLowerCase();
 
-  // detect recipe type
-  let type = context.lastType;
+  // detect dessert type
+  if (t.includes("cookie")) memory.lastType = "cookie";
+  if (t.includes("cake")) memory.lastType = "cake";
+  if (t.includes("brownie")) memory.lastType = "brownie";
 
-  if (t.includes("cookie")) type = "cookie";
-  else if (t.includes("cake")) type = "cake";
-  else if (t.includes("brownie")) type = "brownie";
+  let type = memory.lastType;
 
-  context.lastType = type;
-
-  // ingredient extraction
   let sugar = extract(text, "sugar");
   let flour = extract(text, "flour");
   let butter = extract(text, "butter");
   let eggs = extract(text, "egg");
 
   if (sugar || flour || butter || eggs) {
-    context.lastIngredients = { sugar, flour, butter, eggs };
+    memory.lastIngredients = { sugar, flour, butter, eggs };
   }
 
-  // rewrite mode
-  if (t.includes("rewrite") || t.includes("convert") || t.includes("improve")) {
-    return rewrite(type, context.lastIngredients);
+  if (t.includes("rewrite") || t.includes("convert") || t.includes("fix")) {
+    return rewrite(type, memory.lastIngredients);
   }
 
-  return analyze(type, sugar,
+  return analyze(type, sugar, flour, butter, eggs);
+}
+
+/* ================= REWRITE ENGINE ================= */
+
+function rewrite(type, ing) {
+
+  let s = ing.sugar || 0;
+  let f = ing.flour || 0;
+  let b = ing.butter || 0;
+  let e = ing.eggs || 0;
+
+  let sugarStruct = Math.round(s * 0.6);
+  let monkfruit = (s * 0.001).toFixed(2);
+
+  return `
+🧠 RECIPE REWRITE (${type.toUpperCase()})
+
+🍬 Sugar
+Original: ${s}g
+Structure sugar: ${sugarStruct}g
+Monkfruit extract: ${monkfruit}g
+
+🌾 Flour: ${f || "no change needed"}
+🧈 Butter: ${b || "no change needed"}
+🥚 Eggs: ${e || "no change needed"}
+
+⚖️ WHY THIS WORKS
+- Sugar reduced without collapsing structure
+- Sweetness preserved using extract
+- Texture stability maintained
+
+💡 Tip: ask “make full method”
+`;
+}
+
+/* ================= ANALYSIS ENGINE ================= */
+
+function analyze(type, sugar, flour, butter, eggs) {
+
+  let score = 50;
+
+  if (sugar) score += 10;
+  if (flour) score += 10;
+  if (butter > 80) score += 10;
+  if (eggs >= 2) score += 10;
+
+  let texture = "Balanced bake";
+
+  if (type === "cookie") {
+    texture = "Cookies: texture depends on flour + sugar ratio";
+  }
+
+  if (type === "cake") {
+    texture = "Cake: crumb softness depends on flour type";
+  }
+
+  if (type === "brownie") {
+    texture = "Brownies: fudgy vs cakey depends on fat/sugar balance";
+  }
+
+  return `
+🧠 BAKER AI (${type.toUpperCase()})
+
+🍬 Sugar: ${sugar || memory.lastIngredients.sugar || "?"}
+🌾 Flour: ${flour || memory.lastIngredients.flour || "?"}
+🧈 Butter: ${butter || memory.lastIngredients.butter || "?"}
+🥚 Eggs: ${eggs || memory.lastIngredients.eggs || "?"}
+
+⚖️ Score: ${score}/100
+
+🍰 Texture Insight
+${texture}
+
+💡 Try:
+"rewrite recipe"
+`;
+}
+
+/* ================= HELPERS ================= */
+
+function extract(text, word) {
+  let m = text.match(new RegExp("(\\d+)\\s*g\\s*" + word));
+  return m ? Number(m[1]) : 0;
+}
+
+/* ================= UI ================= */
+
+function add(sender, text, cls) {
+  let div = document.createElement("div");
+  div.className = "msg " + cls;
+  div.innerHTML = `<b>${sender}</b><br><br>${text}`;
+  document.getElementById("chat").appendChild(div);
+  document.getElementById("chat").scrollTop = 999999;
+}
+
+</script>
+
+</body>
+</html>

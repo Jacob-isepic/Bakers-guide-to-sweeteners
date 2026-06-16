@@ -1,80 +1,49 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sugar Engine</title>
-<link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-
-<h2>🍪 Sugar Engine</h2>
-
-<div class="card">
-
-<label>Sugar (grams)</label>
-<input type="number" id="sugar">
-
-<label>Sweetener Type</label>
-<select id="type">
-  <option value="monkfruit">Monk Fruit Blend</option>
-  <option value="allulose">Allulose</option>
-  <option value="pure">Pure Monk Fruit Extract</option>
-</select>
-
-<button onclick="calc()">Generate Baking Plan</button>
-
-</div>
-
-<div class="card">
-<pre id="result" style="white-space: pre-wrap;"></pre>
-</div>
-
-<script>
 function calc() {
+
   let sugar = Number(document.getElementById("sugar").value);
   let type = document.getElementById("type").value;
 
   if (!sugar || sugar <= 0) return;
 
+  // LOAD SETTINGS
+  let mode = localStorage.getItem("mode") || "normal";
+
+  let adjust = 1;
+
+  if (mode === "reduced") adjust = 0.85;
+  if (mode === "lowcarb") adjust = 0.7;
+
   let message = "";
 
   if (type === "monkfruit") {
 
-    let blend = sugar * 0.5;
+    let blend = sugar * 0.5 * adjust;
 
     message =
-`🧁 BAKING PLAN — MONK FRUIT BLEND
+`🧁 MONK FRUIT BLEND
 
-Sugar input: ${sugar}g
-Replace with: ~${blend.toFixed(1)}g blend
+Sugar: ${sugar}g
+Sweetener: ${blend.toFixed(1)}g
 
-✔ Sweetness matches sugar
-✔ Slightly lighter texture
-✔ Best for cakes, cookies, muffins
+Mode: ${mode}
 
-💡 Tip:
-Keep 10–20% real sugar for better browning.`;
+✔ Adjusted sweetness applied`;
 
   }
 
   else if (type === "allulose") {
 
-    let allulose = sugar * 1.3;
+    let allulose = sugar * 1.3 * adjust;
 
     message =
-`🍯 BAKING PLAN — ALLULOSE
+`🍯 ALLULOSE
 
-Sugar input: ${sugar}g
-Replace with: ~${allulose.toFixed(1)}g allulose
+Sugar: ${sugar}g
+Sweetener: ${allulose.toFixed(1)}g
 
-✔ Very close sugar texture
-✔ Good browning
-✔ Slightly less sweet
+Mode: ${mode}
 
-💡 Tip:
-You can reduce sweetness intentionally for balance.`;
+✔ Texture preserved`;
 
   }
 
@@ -84,27 +53,15 @@ You can reduce sweetness intentionally for balance.`;
     let high = (sugar * 1000) / 150;
 
     message =
-`⚠️ PURE MONK FRUIT EXTRACT MODE
+`⚠️ PURE MONK FRUIT EXTRACT
 
-Sugar input: ${sugar}g
+Estimated range:
+${low.toFixed(1)}mg – ${high.toFixed(1)}mg
 
-📊 Estimated potency range:
-• ${low.toFixed(1)} mg (high strength)
-• ${high.toFixed(1)} mg (lower strength)
+Mode: ${mode}
 
-🧠 Reality:
-✔ Not used directly in baking
-✔ Must be diluted into bulk sweetener
-
-🍯 Best ratio:
-1g extract → 200–300g erythritol or allulose
-
-🧁 Always convert before use.`;
+✔ Must be diluted before use`;
   }
 
   document.getElementById("result").innerText = message;
 }
-</script>
-
-</body>
-</html>

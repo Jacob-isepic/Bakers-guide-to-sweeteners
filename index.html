@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>Baker AI Chef Mode</title>
+<title>Baker AI</title>
 
 <style>
 html, body {
@@ -26,7 +26,6 @@ header {
   flex-direction: column;
 }
 
-/* TOP BAR */
 .topbar {
   display: flex;
   gap: 8px;
@@ -44,7 +43,6 @@ button {
   font-size: 14px;
 }
 
-/* OUTPUT */
 .output {
   flex: 1;
   overflow-y: auto;
@@ -59,9 +57,9 @@ button {
   padding: 12px;
   border-radius: 12px;
   border: 1px solid #ddd;
+  white-space: pre-wrap;
 }
 
-/* INPUT */
 .inputBar {
   display: flex;
   padding: 10px;
@@ -78,7 +76,7 @@ input {
   border: 1px solid #ccc;
 }
 
-/* MODAL */
+/* MODALS */
 .modal {
   position: fixed;
   inset: 0;
@@ -91,18 +89,18 @@ input {
 .panel {
   background: white;
   width: 90%;
-  border-radius: 12px;
-  padding: 12px;
   max-height: 80%;
   overflow-y: auto;
+  border-radius: 12px;
+  padding: 12px;
 }
 
 .option {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  margin: 5px;
   display: inline-block;
+  padding: 8px 10px;
+  margin: 4px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
   cursor: pointer;
 }
 
@@ -111,88 +109,74 @@ input {
   color: white;
 }
 </style>
-
 </head>
 
 <body>
 
-<header>🍰 Baker AI — Chef Mode</header>
+<header>🍰 Baker AI</header>
 
 <div class="container">
 
-<!-- TOP -->
-<<div class="topbar">
+<div class="topbar">
   <button onclick="openSettings()">⚙ Settings</button>
   <button onclick="toggleChef()">👨‍🍳 Chef Mode</button>
   <button onclick="openHelp()">❓ Help</button>
 </div>
 
-<!-- OUTPUT -->
 <div class="output" id="output"></div>
 
-<!-- INPUT -->
 <div class="inputBar">
-  <input id="input" placeholder="e.g. convert 1 cup sugar for cookies" />
+  <input id="input" placeholder="e.g. convert 200g sugar for cookies" />
   <button onclick="run()">Send</button>
 </div>
 
 </div>
 
 <!-- SETTINGS -->
-<div class="modal" id="modal">
+<div class="modal" id="settings">
   <div class="panel">
 
     <h3>⚖ Units</h3>
     <div>
       <span class="option" onclick="setUnit('g')">grams</span>
       <span class="option" onclick="setUnit('cup')">cups</span>
-      <span class="option" onclick="setUnit('tbsp')">tablespoons</span>
-      <span class="option" onclick="setUnit('tsp')">teaspoons</span>
-      <span class="option" onclick="setUnit('halfcup')">½ cup</span>
+      <span class="option" onclick="setUnit('tbsp')">tbsp</span>
+      <span class="option" onclick="setUnit('tsp')">tsp</span>
+      <span class="option" onclick="setUnit('half')">½ cup</span>
     </div>
 
     <h3>🍬 Ingredients</h3>
     <div id="ingredients"></div>
 
     <br>
-    <button onclick="closeSettings()">Done</button>
-
+    <button onclick="closeSettings()">Close</button>
   </div>
 </div>
-<div class="modal" id="helpModal">
+
+<!-- HELP -->
+<div class="modal" id="help">
   <div class="panel">
+    <h3>❓ Help Guide</h3>
 
-    <h3>❓ Baker AI Help Guide</h3>
+    <p><b>👨‍🍳 Chef Mode</b><br>Turns AI into a baking assistant that explains texture + ingredient effects.</p>
 
-    <p><b>👨‍🍳 Chef Mode</b><br>
-    Turns AI into a baking assistant that explains texture, structure, and ingredient effects.</p>
+    <p><b>⚖ Units</b><br>Choose grams, cups, tbsp, tsp, or ½ cup.</p>
 
-    <p><b>⚖ Units</b><br>
-    Choose how you want measurements (grams, cups, tbsp, tsp).</p>
+    <p><b>🍬 Ingredients</b><br>Click to enable/disable ingredients (green = active).</p>
 
-    <p><b>🍬 Ingredients</b><br>
-    Click items to select them. Green means active.</p>
-
-    <p><b>🧠 AI Input</b><br>
-    Type things like:<br>
+    <p><b>🧠 Try typing:</b><br>
     • convert 200g sugar<br>
     • I’m making cookies<br>
     • use brown sugar instead</p>
 
-    <p><b>📌 Note</b><br>
-    Ingredient system is currently for intelligence preview — future updates will turn this into full recipe calculation.</p>
-
-    <br>
     <button onclick="closeHelp()">Close</button>
-
   </div>
 </div>
+
 <script>
 
-/* ================= STATE ================= */
-
 let state = {
-  chefMode: false,
+  chef: false,
   unit: "g",
   ingredients: {
     "white sugar": false,
@@ -207,112 +191,99 @@ let state = {
   }
 };
 
-/* ================= UI ================= */
+/* INIT */
+window.onload = () => log("System", "Baker AI ready ✔");
 
-function openSettings() {
-  document.getElementById("modal").style.display = "flex";
+/* UI */
+function openSettings(){
+  document.getElementById("settings").style.display="flex";
   renderIngredients();
 }
 
-function closeSettings() {
-  document.getElementById("modal").style.display = "none";
+function closeSettings(){
+  document.getElementById("settings").style.display="none";
 }
 
-function setUnit(u) {
+function openHelp(){
+  document.getElementById("help").style.display="flex";
+}
+
+function closeHelp(){
+  document.getElementById("help").style.display="none";
+}
+
+function toggleChef(){
+  state.chef = !state.chef;
+  log("Chef Mode", state.chef ? "ON 👨‍🍳" : "OFF");
+}
+
+function setUnit(u){
   state.unit = u;
-  log("System", "Unit set to: " + u);
+  log("Unit", "Set to " + u);
 }
 
-function toggleChef() {
-  state.chefMode = !state.chefMode;
-  log("Chef Mode", state.chefMode ? "ON 👨‍🍳" : "OFF");
-}
-
-/* ================= INGREDIENT UI ================= */
-
-function renderIngredients() {
+/* INGREDIENTS */
+function renderIngredients(){
   let box = document.getElementById("ingredients");
   box.innerHTML = "";
 
-  Object.keys(state.ingredients).forEach(k => {
-    let div = document.createElement("span");
-    div.className = "option" + (state.ingredients[k] ? " active" : "");
-    div.innerText = k;
+  for(let k in state.ingredients){
+    let el = document.createElement("div");
+    el.className = "option" + (state.ingredients[k] ? " active" : "");
+    el.innerText = k;
 
-    div.onclick = () => {
+    el.onclick = () => {
       state.ingredients[k] = !state.ingredients[k];
       renderIngredients();
     };
 
-    box.appendChild(div);
-  });
+    box.appendChild(el);
+  }
 }
 
-/* ================= MAIN ================= */
-
-function run() {
+/* MAIN */
+function run(){
   let text = document.getElementById("input").value.trim();
-  if (!text) return;
+  if(!text) return;
 
   log("You", text);
   log("Baker AI", process(text));
-
   document.getElementById("input").value = "";
 }
 
-/* ================= CHEF ENGINE ================= */
+function process(text){
 
-function process(text) {
+  let amount = text.match(/\d+/);
+  amount = amount ? amount[0] : "unknown";
 
-  let t = text.toLowerCase();
+  let selected = Object.keys(state.ingredients).filter(i => state.ingredients[i]);
 
-  let amount = extract(text);
+  if(state.chef){
+    return `👨‍🍳 CHEF MODE
 
-  if (state.chefMode) {
+I see you're working with ${amount} (${state.unit})
 
-    return `
-👨‍🍳 CHEF MODE ACTIVE
+Selected ingredients:
+${selected.join(", ") || "none"}
 
-You used ${amount || "some"} ${state.unit}
-
-🍰 I’m adjusting your recipe like a real baker:
-
-- Unit system: ${state.unit}
-- Selected ingredients are being accounted for
-- Sugar balance + flour structure adjusted automatically
-
-💡 Tip:
-This mode focuses on texture + baking outcome, not just numbers.
-`;
+💡 Chef insight:
+I’ll adjust sweetness, structure, and texture based on your ingredient choices.`;
   }
 
-  return `
-🧠 STANDARD MODE
+  return `🧠 STANDARD MODE
 
-Amount detected: ${amount || "unknown"} ${state.unit}
+Amount: ${amount} (${state.unit})
 
-Use Chef Mode for:
-- texture advice
-- ingredient balancing
-- smarter baking decisions
-`;
+Tip: turn on Chef Mode for baking guidance.`;
 }
 
-/* ================= HELPERS ================= */
-
-function extract(text) {
-  let m = text.match(/(\d+)/);
-  return m ? Number(m[1]) : 0;
-}
-
-/* ================= LOG ================= */
-
-function log(title, msg) {
-  let div = document.createElement("div");
-  div.className = "card";
-  div.innerHTML = "<b>" + title + "</b><br><br>" + msg;
-  document.getElementById("output").appendChild(div);
-  document.getElementById("output").scrollTop = 999999;
+/* LOG */
+function log(title,msg){
+  let d=document.createElement("div");
+  d.className="card";
+  d.innerText=title + "\n\n" + msg;
+  document.getElementById("output").appendChild(d);
+  document.getElementById("output").scrollTop=999999;
 }
 
 </script>

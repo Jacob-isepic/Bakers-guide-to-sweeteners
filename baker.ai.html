@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baker AI Core</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<h2>🧠 Baker AI Core System</h2>
+
+<div class="card">
+
+<label>Paste Recipe OR Ask AI</label>
+<textarea id="input" rows="8" style="width:100%">
+Example:
+200g sugar
+100g butter
+250g flour
+2 eggs
+</textarea>
+
+<button onclick="analyze()">Analyze Recipe</button>
+<button onclick="saveRecipe()">Save Recipe</button>
+<button onclick="loadRecipe()">Load Last Recipe</button>
+
+</div>
+
+<div class="card">
+<pre id="out" style="white-space: pre-wrap;"></pre>
+</div>
+
+<script>
+
+// =====================
+// MEMORY SYSTEM
+// =====================
+function saveRecipe() {
+  localStorage.setItem("recipe", document.getElementById("input").value);
+  alert("Recipe saved ✔");
+}
+
+function loadRecipe() {
+  document.getElementById("input").value =
+  localStorage.getItem("recipe") || "No saved recipe";
+}
+
+// =====================
+// CORE ANALYSIS ENGINE
+// =====================
+function analyze() {
+
+  let text = document.getElementById("input").value.toLowerCase();
+
+  let sugar = extract("sugar", text);
+  let flour = extract("flour", text);
+  let butter = extract("butter", text);
+  let eggs = extract("egg", text);
+
+  // =====================
+  // INGREDIENT LOGIC
+  // =====================
+  let balance = 50;
+
+  if (sugar && flour) balance += 10;
+  if (butter > sugar * 0.6) balance += 10;
+  if (eggs >= 2) balance += 10;
+
+  if (sugar > flour * 0.8) balance -= 10;
+  if (!butter) balance -= 15;
+
+  balance = Math.max(0, Math.min(100, balance));
+
+  // =====================
+  // TEXTURE PREDICTION
+  // =====================
+  let texture = "Neutral";
+
+  if (sugar > flour * 0.7) texture = "Chewy / soft cookies likely";
+  if (butter > sugar * 0.5) texture = "Rich / moist texture";
+  if (eggs >= 3) texture = "Cakey / airy texture";
+  if (flour > sugar * 1.2) texture = "Dry risk / firm structure";
+
+  // =====================
+  // SUGAR DETECTION
+  // =====================
+  let sugarLine = sugar
+    ? `${sugar}g sugar detected`
+    : "No sugar detected";
+
+  // =====================
+  // OUTPUT
+  // =====================
+  document.getElementById("out").innerText =
+`🧠 BAKER AI ANALYSIS
+
+──────── INGREDIENTS ────────
+Sugar: ${sugar}
+Flour: ${flour}
+Butter: ${butter}
+Eggs: ${eggs}
+
+──────── BALANCE SCORE ────────
+${balance}/100
+
+──────── TEXTURE PREDICTION ────────
+${texture}
+
+──────── NOTES ────────
+${sugarLine}
+
+✔ AI analysis complete`;
+
+}
+
+// =====================
+// SIMPLE PARSER
+// =====================
+function extract(word, text) {
+  let match = text.match(new RegExp("(\\d+)\\s*g\\s*" + word));
+  return match ? Number(match[1]) : 0;
+}
+
+</script>
+
+</body>
+</html>

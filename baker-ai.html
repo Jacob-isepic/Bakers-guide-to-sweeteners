@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Baker AI</title>
+<title>Baker AI Chat</title>
 <link rel="stylesheet" href="style.css">
 
 <style>
 body { font-family: Arial; margin: 0; }
+
 h2 { padding: 10px; }
 
 .chat {
@@ -17,10 +18,7 @@ h2 { padding: 10px; }
   background: #f7f7f7;
 }
 
-.msg {
-  margin: 8px 0;
-  padding: 6px;
-}
+.msg { margin: 8px 0; }
 
 .user { font-weight: bold; }
 .ai { color: #0a7; }
@@ -31,37 +29,37 @@ h2 { padding: 10px; }
   padding: 10px;
 }
 
-input {
-  flex: 1;
-  padding: 10px;
-}
-button {
-  padding: 10px;
-}
+input { flex: 1; padding: 10px; }
+button { padding: 10px; }
 
-.card {
-  margin: 10px;
-}
+.card { margin: 10px; }
 </style>
 
 </head>
 
 <body>
 
-<h2>🧠 Baker AI Assistant</h2>
+<h2>🧠 Baker AI (Chat Mode)</h2>
 
 <div class="card">
 
 <div class="chat" id="chat"></div>
 
 <div class="bar">
-  <input id="input" placeholder="Try: fix cookie recipe 200g sugar">
+  <input id="input" placeholder="Talk to Baker AI...">
   <button onclick="send()">Send</button>
 </div>
 
 </div>
 
 <script>
+
+// ================= MEMORY (SESSION CONTEXT) =================
+let context = {
+  lastRecipe: null,
+  lastType: null,
+  lastIngredients: {}
+};
 
 // ================= CHAT =================
 function send() {
@@ -78,7 +76,7 @@ function send() {
   document.getElementById("input").value = "";
 }
 
-// ================= CORE AI =================
+// ================= CORE BRAIN =================
 function brain(text) {
 
   let t = text.toLowerCase();
@@ -88,95 +86,109 @@ function brain(text) {
   let butter = extract(t, "butter");
   let eggs = extract(t, "egg");
 
-  // ================= TYPE DETECTION =================
-  let type = "general";
+  // ================= UPDATE MEMORY =================
+  if (sugar || flour || butter || eggs) {
+    context.lastIngredients = { sugar, flour, butter, eggs };
+  }
+
+  // ================= DETECT TYPE =================
+  let type = context.lastType || "general";
 
   if (t.includes("cookie")) type = "cookie";
   else if (t.includes("cake")) type = "cake";
   else if (t.includes("brownie")) type = "brownie";
 
-  // ================= SCORE =================
+  context.lastType = type;
+
+  // ================= REWRITE REQUEST =================
+  if (t.includes("rewrite") || t.includes("improve") || t.includes("fix")) {
+    context.lastRecipe = t;
+    return rewriteRecipe(type, context.lastIngredients);
+  }
+
+  // ================= NORMAL ANALYSIS =================
+  return analyze(type, sugar, flour, butter, eggs);
+}
+
+// ================= RECIPE REWRITER =================
+function rewriteRecipe(type, ing) {
+
+  let s = ing.sugar || 0;
+  let f = ing.flour || 0;
+  let b = ing.butter || 0;
+  let e = ing.eggs || 0;
+
+  let newSugar = Math.round(s * 0.6);
+  let extract = (s * 0.001).toFixed(2);
+
+  return `
+🧠 RECIPE REWRITE (${type.toUpperCase()})
+
+Here’s your improved version:
+
+🍪 Ingredients adjustment:
+• Sugar: ${s}g → ${newSugar}g (kept for structure)
+• Pure sweetness: ${extract}g monk fruit extract
+• Flour: ${f || "keep same"}
+• Butter: ${b || "keep same"}
+• Eggs: ${e || "keep same"}
+
+✨ Why this works:
+- Sugar provides structure + chew
+- Extract gives sweetness without bulk loss
+- Keeps texture stable instead of collapsing
+
+💡 Result:
+Better ${type}, improved moisture + consistency
+
+Want me to convert full step-by-step method too?
+`;
+}
+
+// ================= ANALYSIS =================
+function analyze(type, sugar, flour, butter, eggs) {
+
   let score = 50;
 
   if (sugar && flour) score += 10;
   if (butter > 80) score += 10;
   if (eggs >= 2) score += 10;
-  if (sugar > flour * 0.8) score -= 10;
 
-  let texture = "";
-  let advice = "";
+  let texture = "Balanced structure";
 
-  // ================= COOKIE =================
   if (type === "cookie") {
-
-    texture = sugar > flour * 0.7
-      ? "Soft chewy cookies likely"
-      : "Crispier cookie texture";
-
-    advice = pick([
-      "Cookies need balance between fat and sugar for chewiness.",
-      "Don’t remove all sugar — it affects structure too.",
-      "Chilling dough improves texture a lot."
-    ]);
+    texture = sugar > flour * 0.7 ? "Soft chewy cookies" : "Crispier cookies";
   }
 
-  // ================= CAKE =================
-  else if (type === "cake") {
-
-    texture = eggs >= 3
-      ? "Light airy cake structure"
-      : "Denser cake likely";
-
-    advice = pick([
-      "Cakes depend heavily on egg structure.",
-      "Don’t overmix or the crumb becomes dense.",
-      "Keep moisture balanced for softness."
-    ]);
+  if (type === "cake") {
+    texture = eggs >= 3 ? "Light airy cake" : "Denser cake";
   }
 
-  // ================= BROWNIE =================
-  else if (type === "brownie") {
-
-    texture = butter > sugar * 0.5
-      ? "Fudgy brownie likely"
-      : "More cakey brownie texture";
-
-    advice = pick([
-      "Brownies rely on fat for fudginess.",
-      "Slight underbake improves texture.",
-      "Sugar contributes to chewiness more than expected."
-    ]);
-  }
-
-  // ================= GENERAL =================
-  else {
-
-    texture = "Unknown bake type";
-    advice = pick([
-      "Tell me if this is a cookie, cake, or brownie.",
-      "I can optimise recipes better if I know the bake type.",
-      "Send a recipe and I’ll analyse it."
-    ]);
+  if (type === "brownie") {
+    texture = butter > sugar * 0.5 ? "Fudgy brownie" : "Cakey brownie";
   }
 
   return `
-🧠 BAKER AI (${type.toUpperCase()})
+🧠 Baker AI (${type.toUpperCase()})
 
-Ingredients detected:
-• Sugar: ${sugar || "?"}
-• Flour: ${flour || "?"}
-• Butter: ${butter || "?"}
-• Eggs: ${eggs || "?"}
+I remember what we’ve been working on.
 
-⚖️ Balance Score: ${score}/100
+• Sugar: ${sugar || context.lastIngredients.sugar || "?"}
+• Flour: ${flour || context.lastIngredients.flour || "?"}
+• Butter: ${butter || context.lastIngredients.butter || "?"}
+• Eggs: ${eggs || context.lastIngredients.eggs || "?"}
 
-🍪 Texture:
+⚖️ Score: ${score}/100
+
+🍪 Texture prediction:
 ${texture}
 
-🧁 Advice:
-${advice}
+💬 You can say:
+- "rewrite it"
+- "improve this recipe"
+- "convert to better ${type}"
 
-💡 Try: "rewrite this recipe for better ${type}"
+I’ll remember what we’re working on in this chat.
 `;
 }
 
@@ -184,10 +196,6 @@ ${advice}
 function extract(text, word) {
   let m = text.match(new RegExp("(\\d+)\\s*g\\s*" + word));
   return m ? Number(m[1]) : 0;
-}
-
-function pick(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
 }
 
 // ================= UI =================

@@ -9,60 +9,44 @@
 
 <body>
 
-<h2>⚙️ Working Settings</h2>
+<h2>⚙️ System Settings</h2>
 
 <div class="card">
 
 <h3>Default Sweetener</h3>
-
-<select id="defaultSweetener">
-  <option value="blend">Monk Fruit Blend</option>
+<select id="sweetener">
+  <option value="monkfruit">Monk Fruit Blend</option>
   <option value="allulose">Allulose</option>
-  <option value="pure">Pure Extract (Advanced)</option>
+  <option value="pure">Pure Extract</option>
 </select>
-
-<button onclick="saveSettings()">Save Settings</button>
-
-</div>
-
-<div class="card">
 
 <h3>Sweetness Mode</h3>
-
-<select id="sweetMode">
-  <option value="normal">Normal Sweetness</option>
-  <option value="reduced">Reduced Sweetness</option>
-  <option value="lowcarb">Low Carb (less sweet)</option>
+<select id="mode">
+  <option value="normal">Normal</option>
+  <option value="reduced">Reduced</option>
+  <option value="lowcarb">Low Carb</option>
 </select>
 
-</div>
+<button onclick="save()">Save</button>
 
-<div class="card">
-<b>Status:</b>
-<pre id="status">Not saved</pre>
+<pre id="status"></pre>
+
 </div>
 
 <script>
-function saveSettings() {
-  let sweetener = document.getElementById("defaultSweetener").value;
-  let mode = document.getElementById("sweetMode").value;
+function save() {
+  localStorage.setItem("sweetener", document.getElementById("sweetener").value);
+  localStorage.setItem("mode", document.getElementById("mode").value);
 
-  localStorage.setItem("sweetener", sweetener);
-  localStorage.setItem("mode", mode);
-
-  document.getElementById("status").innerText =
-`Saved:
-Default Sweetener = ${sweetener}
-Mode = ${mode}`;
+  document.getElementById("status").innerText = "Saved ✔";
 }
 
-// load existing settings
 window.onload = function() {
-  let s = localStorage.getItem("sweetener");
-  let m = localStorage.getItem("mode");
+  document.getElementById("sweetener").value =
+    localStorage.getItem("sweetener") || "monkfruit";
 
-  if (s) document.getElementById("defaultSweetener").value = s;
-  if (m) document.getElementById("sweetMode").value = m;
+  document.getElementById("mode").value =
+    localStorage.getItem("mode") || "normal";
 }
 </script>
 

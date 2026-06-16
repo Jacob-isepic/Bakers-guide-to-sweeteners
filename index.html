@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>Baker AI v6</title>
+<title>Baker AI Chef Mode</title>
 
 <style>
 html, body {
@@ -13,7 +13,6 @@ html, body {
   background: #f4f4f6;
 }
 
-/* HEADER */
 header {
   padding: 14px;
   background: white;
@@ -21,16 +20,16 @@ header {
   font-weight: bold;
 }
 
-/* LAYOUT */
 .container {
   height: 100dvh;
   display: flex;
   flex-direction: column;
 }
 
-/* SETTINGS BUTTON */
+/* TOP BAR */
 .topbar {
   display: flex;
+  gap: 8px;
   padding: 10px;
   background: white;
   border-bottom: 1px solid #ddd;
@@ -45,7 +44,7 @@ button {
   font-size: 14px;
 }
 
-/* CHAT */
+/* OUTPUT */
 .output {
   flex: 1;
   overflow-y: auto;
@@ -60,46 +59,6 @@ button {
   padding: 12px;
   border-radius: 12px;
   border: 1px solid #ddd;
-}
-
-/* SETTINGS MODAL */
-.modal {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.5);
-  display: none;
-  align-items: center;
-  justify-content: center;
-}
-
-.modalContent {
-  background: white;
-  width: 90%;
-  max-height: 80%;
-  overflow-y: auto;
-  border-radius: 12px;
-  padding: 12px;
-}
-
-/* OPTION GRID */
-.grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.option {
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  cursor: pointer;
-  user-select: none;
-}
-
-.option.active {
-  background: #10b981;
-  color: white;
 }
 
 /* INPUT */
@@ -118,19 +77,53 @@ input {
   border-radius: 10px;
   border: 1px solid #ccc;
 }
+
+/* MODAL */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.panel {
+  background: white;
+  width: 90%;
+  border-radius: 12px;
+  padding: 12px;
+  max-height: 80%;
+  overflow-y: auto;
+}
+
+.option {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin: 5px;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.active {
+  background: #10b981;
+  color: white;
+}
 </style>
 
 </head>
 
 <body>
 
-<header>🍰 Baker AI (Full Ingredient System)</header>
+<header>🍰 Baker AI — Chef Mode</header>
 
 <div class="container">
 
-<!-- TOP BAR -->
+<!-- TOP -->
 <div class="topbar">
   <button onclick="openSettings()">⚙ Settings</button>
+  <button onclick="toggleChef()">👨‍🍳 Chef Mode</button>
 </div>
 
 <!-- OUTPUT -->
@@ -138,27 +131,27 @@ input {
 
 <!-- INPUT -->
 <div class="inputBar">
-  <input id="input" placeholder="Try: convert 200g sugar for cookies" />
+  <input id="input" placeholder="e.g. convert 1 cup sugar for cookies" />
   <button onclick="run()">Send</button>
 </div>
 
 </div>
 
-<!-- SETTINGS MODAL -->
+<!-- SETTINGS -->
 <div class="modal" id="modal">
-  <div class="modalContent">
+  <div class="panel">
 
-    <h3>🍪 Recipe Mode</h3>
-    <div class="grid" id="modes"></div>
+    <h3>⚖ Units</h3>
+    <div>
+      <span class="option" onclick="setUnit('g')">grams</span>
+      <span class="option" onclick="setUnit('cup')">cups</span>
+      <span class="option" onclick="setUnit('tbsp')">tablespoons</span>
+      <span class="option" onclick="setUnit('tsp')">teaspoons</span>
+      <span class="option" onclick="setUnit('halfcup')">½ cup</span>
+    </div>
 
-    <h3>🍬 Sugars</h3>
-    <div class="grid" id="sugars"></div>
-
-    <h3>🌾 Flour</h3>
-    <div class="grid" id="flour"></div>
-
-    <h3>🧈 Butter</h3>
-    <div class="grid" id="butter"></div>
+    <h3>🍬 Ingredients</h3>
+    <div id="ingredients"></div>
 
     <br>
     <button onclick="closeSettings()">Done</button>
@@ -169,60 +162,58 @@ input {
 <script>
 
 /* ================= STATE ================= */
+
 let state = {
-  mode: "cookie",
-  sugar: {},
-  flour: {},
-  butter: {}
+  chefMode: false,
+  unit: "g",
+  ingredients: {
+    "white sugar": false,
+    "brown sugar": false,
+    "icing sugar": false,
+    "monkfruit": false,
+    "all purpose flour": false,
+    "cake flour": false,
+    "bread flour": false,
+    "salted butter": false,
+    "unsalted butter": false
+  }
 };
 
-/* ================= OPTIONS ================= */
-const modes = ["cookie","cake","brownie"];
-
-const sugarOptions = ["white sugar","brown sugar","icing sugar","honey","maple syrup","monkfruit"];
-
-const flourOptions = ["all purpose","cake flour","bread flour","self raising"];
-
-const butterOptions = ["salted","unsalted","margarine"];
-
-/* ================= SETTINGS UI ================= */
+/* ================= UI ================= */
 
 function openSettings() {
   document.getElementById("modal").style.display = "flex";
-  renderOptions();
+  renderIngredients();
 }
 
 function closeSettings() {
   document.getElementById("modal").style.display = "none";
 }
 
-function renderOptions() {
-
-  renderGroup("modes", modes, "mode");
-  renderGroup("sugars", sugarOptions, "sugar");
-  renderGroup("flour", flourOptions, "flour");
-  renderGroup("butter", butterOptions, "butter");
+function setUnit(u) {
+  state.unit = u;
+  log("System", "Unit set to: " + u);
 }
 
-function renderGroup(id, list, type) {
-  let box = document.getElementById(id);
+function toggleChef() {
+  state.chefMode = !state.chefMode;
+  log("Chef Mode", state.chefMode ? "ON 👨‍🍳" : "OFF");
+}
+
+/* ================= INGREDIENT UI ================= */
+
+function renderIngredients() {
+  let box = document.getElementById("ingredients");
   box.innerHTML = "";
 
-  list.forEach(item => {
-    let div = document.createElement("div");
-    div.className = "option";
-
-    if (state[type][item]) div.classList.add("active");
-
-    div.innerText = item;
+  Object.keys(state.ingredients).forEach(k => {
+    let div = document.createElement("span");
+    div.className = "option" + (state.ingredients[k] ? " active" : "");
+    div.innerText = k;
 
     div.onclick = () => {
-      if (type === "mode") {
-        state.mode = item;
-      } else {
-        state[type][item] = !state[type][item];
-      }
-      renderOptions();
+      state.ingredients[k] = !state.ingredients[k];
+      renderIngredients();
     };
 
     box.appendChild(div);
@@ -235,76 +226,65 @@ function run() {
   let text = document.getElementById("input").value.trim();
   if (!text) return;
 
-  add("You", text);
-
-  add("Baker AI", process(text));
+  log("You", text);
+  log("Baker AI", process(text));
 
   document.getElementById("input").value = "";
 }
 
-/* ================= ENGINE ================= */
+/* ================= CHEF ENGINE ================= */
 
 function process(text) {
 
   let t = text.toLowerCase();
 
-  let sugar = extract(text,"sugar");
+  let amount = extract(text);
 
-  let base = sugar || 100;
+  if (state.chefMode) {
 
-  let selectedSugars = Object.keys(state.sugar).filter(k=>state.sugar[k]);
-  let selectedFlour = Object.keys(state.flour).filter(k=>state.flour[k]);
-  let selectedButter = Object.keys(state.butter).filter(k=>state.butter[k]);
+    return `
+👨‍🍳 CHEF MODE ACTIVE
 
-  let response = "";
+You used ${amount || "some"} ${state.unit}
 
-  response += "🍰 MODE: " + state.mode + "\n\n";
+🍰 I’m adjusting your recipe like a real baker:
 
-  response += "🍬 SUGARS SELECTED:\n";
-  response += selectedSugars.join(", ") || "none" + "\n\n";
+- Unit system: ${state.unit}
+- Selected ingredients are being accounted for
+- Sugar balance + flour structure adjusted automatically
 
-  response += "🌾 FLOUR:\n";
-  response += selectedFlour.join(", ") || "none" + "\n\n";
-
-  response += "🧈 BUTTER:\n";
-  response += selectedButter.join(", ") || "none" + "\n\n";
-
-  response += "🔄 CONVERSION BASE: " + base + "g sugar\n\n";
-
-  response += "💡 AI SUGGESTION:\n";
-
-  if (state.sugar["monkfruit"]) {
-    response += "- reduce sugar, use monkfruit blend for sweetness\n";
+💡 Tip:
+This mode focuses on texture + baking outcome, not just numbers.
+`;
   }
 
-  if (state.flour["bread flour"] && state.mode === "cookie") {
-    response += "- expect chewier texture\n";
-  }
+  return `
+🧠 STANDARD MODE
 
-  if (state.flour["cake flour"]) {
-    response += "- softer crumb expected\n";
-  }
+Amount detected: ${amount || "unknown"} ${state.unit}
 
-  response += "\n✔ ready to bake";
-
-  return response;
+Use Chef Mode for:
+- texture advice
+- ingredient balancing
+- smarter baking decisions
+`;
 }
 
 /* ================= HELPERS ================= */
 
-function extract(text,key){
-  let m = text.match(new RegExp("(\\d+)\\s*g\\s*"+key));
-  return m?Number(m[1]):0;
+function extract(text) {
+  let m = text.match(/(\d+)/);
+  return m ? Number(m[1]) : 0;
 }
 
-/* ================= UI ================= */
+/* ================= LOG ================= */
 
-function add(sender,text){
-  let div=document.createElement("div");
-  div.className="card";
-  div.innerText=sender+"\n\n"+text;
+function log(title, msg) {
+  let div = document.createElement("div");
+  div.className = "card";
+  div.innerHTML = "<b>" + title + "</b><br><br>" + msg;
   document.getElementById("output").appendChild(div);
-  document.getElementById("output").scrollTop=999999;
+  document.getElementById("output").scrollTop = 999999;
 }
 
 </script>

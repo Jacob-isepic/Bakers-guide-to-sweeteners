@@ -3,12 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>Baker AI</title>
+<title>Baker AI v6</title>
 
 <style>
 html, body {
   margin: 0;
-  padding: 0;
   font-family: Arial;
   height: 100%;
   background: #f4f4f6;
@@ -22,21 +21,19 @@ header {
   font-weight: bold;
 }
 
-/* APP LAYOUT */
+/* LAYOUT */
 .container {
   height: 100dvh;
   display: flex;
   flex-direction: column;
 }
 
-/* BUTTON BAR */
-.controls {
+/* SETTINGS BUTTON */
+.topbar {
   display: flex;
-  gap: 8px;
   padding: 10px;
   background: white;
   border-bottom: 1px solid #ddd;
-  flex-wrap: wrap;
 }
 
 button {
@@ -48,10 +45,9 @@ button {
   font-size: 14px;
 }
 
-/* OUTPUT */
+/* CHAT */
 .output {
   flex: 1;
-  min-height: 0;
   overflow-y: auto;
   padding: 12px;
   display: flex;
@@ -59,17 +55,51 @@ button {
   gap: 10px;
 }
 
-/* CARD */
 .card {
   background: white;
-  padding: 14px;
+  padding: 12px;
   border-radius: 12px;
-  border: 1px solid #e5e5e5;
+  border: 1px solid #ddd;
 }
 
-.title {
-  font-weight: bold;
-  margin-bottom: 8px;
+/* SETTINGS MODAL */
+.modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.modalContent {
+  background: white;
+  width: 90%;
+  max-height: 80%;
+  overflow-y: auto;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+/* OPTION GRID */
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.option {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  user-select: none;
+}
+
+.option.active {
+  background: #10b981;
+  color: white;
 }
 
 /* INPUT */
@@ -88,177 +118,193 @@ input {
   border-radius: 10px;
   border: 1px solid #ccc;
 }
-
-/* DEBUG BADGE */
-#debug {
-  font-size: 12px;
-  color: #16a34a;
-  padding: 6px 10px;
-}
 </style>
 
 </head>
 
 <body>
 
-<header>🍰 Baker AI (Crash-Proof)</header>
+<header>🍰 Baker AI (Full Ingredient System)</header>
 
 <div class="container">
 
-  <div class="controls">
-    <button onclick="setMode('blend')">Blend</button>
-    <button onclick="setMode('pure')">Pure</button>
-    <button onclick="setMode('extract')">Extract</button>
-    <button onclick="showSettings()">Settings</button>
+<!-- TOP BAR -->
+<div class="topbar">
+  <button onclick="openSettings()">⚙ Settings</button>
+</div>
+
+<!-- OUTPUT -->
+<div class="output" id="output"></div>
+
+<!-- INPUT -->
+<div class="inputBar">
+  <input id="input" placeholder="Try: convert 200g sugar for cookies" />
+  <button onclick="run()">Send</button>
+</div>
+
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal" id="modal">
+  <div class="modalContent">
+
+    <h3>🍪 Recipe Mode</h3>
+    <div class="grid" id="modes"></div>
+
+    <h3>🍬 Sugars</h3>
+    <div class="grid" id="sugars"></div>
+
+    <h3>🌾 Flour</h3>
+    <div class="grid" id="flour"></div>
+
+    <h3>🧈 Butter</h3>
+    <div class="grid" id="butter"></div>
+
+    <br>
+    <button onclick="closeSettings()">Done</button>
+
   </div>
-
-  <div id="debug">Checking system...</div>
-
-  <div class="output" id="output"></div>
-
-  <div class="inputBar">
-    <input id="input" placeholder="e.g. convert 100g sugar" />
-    <button onclick="run()">Send</button>
-  </div>
-
 </div>
 
 <script>
 
-"use strict";
-
-/* ================= SAFE START ================= */
+/* ================= STATE ================= */
 let state = {
-  mode: "blend",
-  last: { sugar: 0, flour: 0, butter: 0 },
-  type: "general"
+  mode: "cookie",
+  sugar: {},
+  flour: {},
+  butter: {}
 };
 
-/* show JS is alive */
-window.onload = function () {
-  document.getElementById("debug").innerText = "JS RUNNING ✔";
-  log("System", "Baker AI ready");
-};
+/* ================= OPTIONS ================= */
+const modes = ["cookie","cake","brownie"];
 
-/* ================= BUTTONS ================= */
+const sugarOptions = ["white sugar","brown sugar","icing sugar","honey","maple syrup","monkfruit"];
 
-function setMode(m) {
-  try {
-    state.mode = m;
-    log("Mode", "Switched to " + m);
-  } catch (e) {
-    error(e);
-  }
+const flourOptions = ["all purpose","cake flour","bread flour","self raising"];
+
+const butterOptions = ["salted","unsalted","margarine"];
+
+/* ================= SETTINGS UI ================= */
+
+function openSettings() {
+  document.getElementById("modal").style.display = "flex";
+  renderOptions();
 }
 
-function showSettings() {
-  log("Settings",
-    "Mode: " + state.mode + "\nBlend / Pure / Extract control system"
-  );
+function closeSettings() {
+  document.getElementById("modal").style.display = "none";
+}
+
+function renderOptions() {
+
+  renderGroup("modes", modes, "mode");
+  renderGroup("sugars", sugarOptions, "sugar");
+  renderGroup("flour", flourOptions, "flour");
+  renderGroup("butter", butterOptions, "butter");
+}
+
+function renderGroup(id, list, type) {
+  let box = document.getElementById(id);
+  box.innerHTML = "";
+
+  list.forEach(item => {
+    let div = document.createElement("div");
+    div.className = "option";
+
+    if (state[type][item]) div.classList.add("active");
+
+    div.innerText = item;
+
+    div.onclick = () => {
+      if (type === "mode") {
+        state.mode = item;
+      } else {
+        state[type][item] = !state[type][item];
+      }
+      renderOptions();
+    };
+
+    box.appendChild(div);
+  });
 }
 
 /* ================= MAIN ================= */
 
 function run() {
-  try {
-    let text = document.getElementById("input").value.trim();
-    if (!text) return;
+  let text = document.getElementById("input").value.trim();
+  if (!text) return;
 
-    log("You", text);
+  add("You", text);
 
-    let result = process(text);
-    log("Baker AI", result);
+  add("Baker AI", process(text));
 
-    document.getElementById("input").value = "";
-  } catch (e) {
-    error(e);
-  }
+  document.getElementById("input").value = "";
 }
+
+/* ================= ENGINE ================= */
 
 function process(text) {
 
   let t = text.toLowerCase();
 
-  if (t.includes("cake")) state.type = "cake";
-  if (t.includes("cookie")) state.type = "cookie";
-  if (t.includes("brownie")) state.type = "brownie";
+  let sugar = extract(text,"sugar");
 
-  let sugar = extract(text, "sugar");
-  let flour = extract(text, "flour");
-  let butter = extract(text, "butter");
+  let base = sugar || 100;
 
-  if (sugar || flour || butter) {
-    state.last = { sugar, flour, butter };
+  let selectedSugars = Object.keys(state.sugar).filter(k=>state.sugar[k]);
+  let selectedFlour = Object.keys(state.flour).filter(k=>state.flour[k]);
+  let selectedButter = Object.keys(state.butter).filter(k=>state.butter[k]);
+
+  let response = "";
+
+  response += "🍰 MODE: " + state.mode + "\n\n";
+
+  response += "🍬 SUGARS SELECTED:\n";
+  response += selectedSugars.join(", ") || "none" + "\n\n";
+
+  response += "🌾 FLOUR:\n";
+  response += selectedFlour.join(", ") || "none" + "\n\n";
+
+  response += "🧈 BUTTER:\n";
+  response += selectedButter.join(", ") || "none" + "\n\n";
+
+  response += "🔄 CONVERSION BASE: " + base + "g sugar\n\n";
+
+  response += "💡 AI SUGGESTION:\n";
+
+  if (state.sugar["monkfruit"]) {
+    response += "- reduce sugar, use monkfruit blend for sweetness\n";
   }
 
-  if (t.includes("convert") || t.includes("rewrite")) {
-    return convert();
+  if (state.flour["bread flour"] && state.mode === "cookie") {
+    response += "- expect chewier texture\n";
   }
 
-  return analyze();
-}
+  if (state.flour["cake flour"]) {
+    response += "- softer crumb expected\n";
+  }
 
-/* ================= CONVERTER ================= */
+  response += "\n✔ ready to bake";
 
-function convert() {
-
-  let s = state.last.sugar || 0;
-  let f = state.last.flour || 0;
-  let b = state.last.butter || 0;
-
-  let ratio =
-    state.mode === "blend" ? 0.6 :
-    state.mode === "pure" ? 0.4 : 0.25;
-
-  let mult =
-    state.mode === "blend" ? 0.0008 :
-    state.mode === "pure" ? 0.0012 : 0.002;
-
-  let structure = Math.round(s * ratio);
-  let extract = (s * mult).toFixed(3);
-
-  return (
-    "Mode: " + state.mode + "\n" +
-    "Type: " + state.type + "\n\n" +
-    "Sugar:\nOriginal: " + s + "g\nStructure: " + structure + "g\nExtract: " + extract + "g\n\n" +
-    "Flour: " + (f || "no change") + "\n" +
-    "Butter: " + (b || "no change")
-  );
-}
-
-/* ================= ANALYZE ================= */
-
-function analyze() {
-  return (
-    "Baker AI Ready\n\n" +
-    "Mode: " + state.mode + "\n" +
-    "Type: " + state.type + "\n\n" +
-    "Try: convert 100g sugar"
-  );
+  return response;
 }
 
 /* ================= HELPERS ================= */
 
-function extract(text, key) {
-  let m = text.match(new RegExp("(\\d+)\\s*g\\s*" + key));
-  return m ? Number(m[1]) : 0;
+function extract(text,key){
+  let m = text.match(new RegExp("(\\d+)\\s*g\\s*"+key));
+  return m?Number(m[1]):0;
 }
 
-/* ================= SAFE LOGGING ================= */
+/* ================= UI ================= */
 
-function log(title, msg) {
-  let div = document.createElement("div");
-  div.className = "card";
-  div.innerHTML = "<div class='title'>" + title + "</div><pre>" + msg + "</pre>";
+function add(sender,text){
+  let div=document.createElement("div");
+  div.className="card";
+  div.innerText=sender+"\n\n"+text;
   document.getElementById("output").appendChild(div);
-}
-
-function error(e) {
-  let div = document.createElement("div");
-  div.className = "card";
-  div.innerHTML = "<div class='title'>⚠ ERROR</div><pre>" + e + "</pre>";
-  document.getElementById("output").appendChild(div);
-  console.log(e);
+  document.getElementById("output").scrollTop=999999;
 }
 
 </script>

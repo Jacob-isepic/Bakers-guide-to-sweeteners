@@ -3,97 +3,105 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Baker AI Core</title>
+<title>Baker AI Chat</title>
 <link rel="stylesheet" href="style.css">
+
+<style>
+.chat { height: 320px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; background:#fafafa; }
+.msg { margin: 6px 0; }
+.user { color: black; font-weight: bold; }
+.ai { color: green; }
+input { width: 75%; padding: 10px; }
+button { padding: 10px; }
+</style>
+
 </head>
 
-<body> 
+<body>
 
-<h2>🧠 Baker AI Core</h2>
-
-<div class="card">
-
-<textarea id="input" rows="8" style="width:100%">
-200g sugar
-100g butter
-250g flour
-2 eggs
-</textarea>
-
-<button onclick="analyze()">Analyze</button>
-<button onclick="saveRecipe()">Save</button>
-<button onclick="loadRecipe()">Load</button>
-
-</div>
+<h2>🧠 Baker AI Chat</h2>
 
 <div class="card">
-<pre id="out" style="white-space: pre-wrap;"></pre>
+
+<div class="chat" id="chat"></div>
+
+<input id="input" placeholder="Try: fix 200g sugar cookie recipe">
+<button onclick="send()">Send</button>
+
 </div>
 
 <script>
 
-// ================= MEMORY =================
-function saveRecipe() {
-  localStorage.setItem("recipe", document.getElementById("input").value);
+function send() {
+
+  let text = document.getElementById("input").value;
+  if (!text) return;
+
+  add("You", text, "user");
+
+  let reply = brain(text.toLowerCase());
+
+  add("AI", reply, "ai");
+
+  document.getElementById("input").value = "";
 }
 
-function loadRecipe() {
-  document.getElementById("input").value =
-  localStorage.getItem("recipe") || "";
+function brain(text) {
+
+  let sugar = extract(text, "sugar");
+  let flour = extract(text, "flour");
+  let butter = extract(text, "butter");
+  let eggs = extract(text, "egg");
+
+  if (text.includes("recipe") || text.includes("fix") || text.includes("cookie") || text.includes("cake")) {
+
+    let score = 50;
+
+    if (sugar && flour) score += 10;
+    if (butter > 80) score += 10;
+    if (eggs >= 2) score += 10;
+    if (sugar > flour * 0.8) score -= 10;
+
+    let texture = "Balanced";
+
+    if (sugar > flour * 0.7) texture = "Soft / chewy";
+    if (butter > sugar * 0.5) texture = "Rich / moist";
+    if (eggs >= 3) texture = "Cakey";
+    if (flour > sugar * 1.2) texture = "Dry risk";
+
+    return `
+🧠 RECIPE ANALYSIS
+
+Sugar: ${sugar || 0}
+Flour: ${flour || 0}
+Butter: ${butter || 0}
+Eggs: ${eggs || 0}
+
+⚖️ Score: ${score}/100
+🍪 Texture: ${texture}
+
+🧁 Suggestion:
+- Balance sugar with structure
+- Use hybrid sweetener system if needed
+`;
+  }
+
+  return "Try: 'fix my cookie recipe 200g sugar'";
 }
 
-// ================= ANALYSIS =================
-function analyze() {
-
-  let text = document.getElementById("input").value.toLowerCase();
-
-  let sugar = find("sugar", text);
-  let flour = find("flour", text);
-  let butter = find("butter", text);
-  let eggs = find("egg", text);
-
-  // SCORE
-  let score = 50;
-
-  if (sugar && flour) score += 10;
-  if (butter > 80) score += 10;
-  if (eggs >= 2) score += 10;
-  if (sugar > flour * 0.8) score -= 10;
-
-  score = Math.max(0, Math.min(100, score));
-
-  // TEXTURE
-  let texture = "Balanced";
-
-  if (sugar > flour * 0.7) texture = "Soft / chewy likely";
-  if (butter > sugar * 0.5) texture = "Rich / moist";
-  if (flour > sugar * 1.2) texture = "Dry risk";
-  if (eggs >= 3) texture = "Cakey / airy";
-
-  document.getElementById("out").innerText =
-`🧠 BAKER AI CORE
-
-Sugar: ${sugar}
-Flour: ${flour}
-Butter: ${butter}
-Eggs: ${eggs}
-
-──────── SCORE ────────
-${score}/100
-
-──────── TEXTURE ────────
-${texture}
-
-✔ Analysis complete`;
-}
-
-// ================= PARSER =================
-function find(word, text) {
+function extract(text, word) {
   let m = text.match(new RegExp("(\\d+)\\s*g\\s*" + word));
   return m ? Number(m[1]) : 0;
+}
+
+function add(name, text, cls) {
+  let div = document.createElement("div");
+  div.className = "msg " + cls;
+  div.innerHTML = `<b>${name}:</b> ${text}`;
+  document.getElementById("chat").appendChild(div);
 }
 
 </script>
 
 </body>
-</html> 
+</html>

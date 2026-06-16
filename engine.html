@@ -3,32 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sugar Engine</title>
+<title>Engine</title>
 <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<h2>🍪 Real Baking Engine</h2>
+<h2>🍪 Sugar Engine</h2>
 
 <div class="card">
 
-<label>Sugar (g)</label>
-<input type="number" id="sugar">
+<input type="number" id="sugar" placeholder="Sugar grams">
 
-<label>Sweetener Type</label>
 <select id="type">
   <option value="blend">Monk Fruit Blend</option>
   <option value="allulose">Allulose</option>
-  <option value="pure">Pure Monk Fruit Extract</option>
+  <option value="pure">Pure Extract</option>
 </select>
 
-<button onclick="calc()">Convert Recipe</button>
+<button onclick="calc()">Convert</button>
 
 </div>
 
 <div class="card">
-<pre id="result" style="white-space: pre-wrap;"></pre>
+<pre id="result"></pre>
 </div>
 
 <script>
@@ -37,99 +35,26 @@ function calc() {
   let sugar = Number(document.getElementById("sugar").value);
   let type = document.getElementById("type").value;
 
-  if (!sugar || sugar <= 0) return;
+  if (!sugar) return;
 
-  let output = "";
+  let out = "";
 
-  // =========================
-  // 1. MONK FRUIT BLEND
-  // =========================
   if (type === "blend") {
-
-    output =
-`🍬 MONK FRUIT BLEND
-
-Sugar: ${sugar}g
-Sweetener needed: ~${sugar}g
-
-🧁 Baking logic:
-✔ Replace 1:1 with sugar
-✔ Maintains structure reasonably well
-✔ Slightly less browning than sugar
-
-💡 Tip:
-If baking cookies → add +5% butter for better softness`;
-
+    out = `Blend: ${sugar}g (1:1 replacement)`;
   }
 
-  // =========================
-  // 2. ALLULOSE
-  // =========================
-  else if (type === "allulose") {
-
-    let amount = sugar * 1.05;
-
-    output =
-`🍯 ALLULOSE
-
-Sugar: ${sugar}g
-Sweetener needed: ~${amount.toFixed(1)}g
-
-🧁 Baking logic:
-✔ 1:1 replacement (slightly higher for browning)
-✔ Improves moisture and softness
-✔ Better caramelisation than most sweeteners
-
-💡 Adjustments:
-- Cookies → +5–10% butter (better chew)
-- Cakes → no major change
-- Brownies → slightly reduced bake time`;
-
+  if (type === "allulose") {
+    out = `Allulose: ${(sugar * 1.05).toFixed(1)}g`;
   }
 
-  // =========================
-  // 3. PURE EXTRACT
-  // =========================
-  else if (type === "pure") {
-
-    let min = (sugar * 1000) / 250;
-    let max = (sugar * 1000) / 150;
-
-    output =
-`⚗️ PURE MONK FRUIT EXTRACT
-
-Sugar: ${sugar}g
-
-⚠ IMPORTANT:
-Never replace sugar directly with extract alone.
-
-🧪 Sweetness equivalent:
-~${min.toFixed(1)}mg – ${max.toFixed(1)}mg
-
-🧁 REAL BAKING METHOD:
-Step 1:
-✔ Mix extract into a bulk sweetener
-
-Recommended base:
-- Allulose (best)
-- Erythritol (alternative)
-
-Step 2:
-✔ Create your own “blend”
-
-Example system:
-200g sugar recipe →
-→ 200g allulose
-→ + tiny pinch extract (for sweetness boost)
-
-💡 Why:
-✔ Sugar provides structure
-✔ Extract provides ONLY sweetness
-✔ Bulk must replace volume`;
-
+  if (type === "pure") {
+    out =
+`Pure Extract:
+DO NOT use directly
+Mix into bulk sweetener`;
   }
 
-  document.getElementById("result").innerText = output;
+  document.getElementById("result").innerText = out;
 }
 </script>
 
